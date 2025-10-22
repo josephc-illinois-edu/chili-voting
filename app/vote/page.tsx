@@ -110,24 +110,35 @@ function VotePageContent() {
     }
   };
 
-  const StarRating = ({ value, onChange }: { value: number; onChange: (val: number) => void }) => {
+  const StarRating = ({ value, onChange, label }: { value: number; onChange: (val: number) => void; label: string }) => {
     return (
-      <div className="flex gap-1">
+      <div className="flex gap-1" role="group" aria-label={`${label} rating`}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className="focus:outline-none"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' && star < 5) {
+                onChange(star + 1);
+              } else if (e.key === 'ArrowLeft' && star > 1) {
+                onChange(star - 1);
+              }
+            }}
+            aria-label={`Rate ${star} out of 5 stars`}
+            aria-pressed={star === value}
+            className="focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded transition-all"
           >
             <Star
               size={32}
               fill={star <= value ? '#fbbf24' : 'none'}
               stroke={star <= value ? '#fbbf24' : '#d1d5db'}
               className="cursor-pointer transition-colors"
+              aria-hidden="true"
             />
           </button>
         ))}
+        <span className="sr-only">{value > 0 ? `Current rating: ${value} out of 5 stars` : 'No rating selected'}</span>
       </div>
     );
   };
@@ -135,8 +146,8 @@ function VotePageContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <Flame className="w-16 h-16 text-red-500 animate-bounce mx-auto mb-4" />
+        <div className="text-center" role="status" aria-live="polite">
+          <Flame className="w-16 h-16 text-red-500 animate-bounce mx-auto mb-4" aria-hidden="true" />
           <p className="text-xl text-gray-600">Loading chili entry...</p>
         </div>
       </div>
@@ -146,17 +157,20 @@ function VotePageContent() {
   if (error || !chili) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center bg-white rounded-lg shadow-lg p-8 max-w-md">
-          <Flame className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Oops!</h1>
-          <p className="text-gray-600 mb-4">{error || 'Something went wrong'}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-2 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 transition-colors"
-          >
-            Go to Home
-          </button>
-        </div>
+        <main>
+          <div className="text-center bg-white rounded-lg shadow-lg p-8 max-w-md" role="alert" aria-live="assertive">
+            <Flame className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Oops!</h1>
+            <p className="text-gray-600 mb-4">{error || 'Something went wrong'}</p>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-2 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              aria-label="Return to home page"
+            >
+              Go to Home
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
@@ -164,121 +178,136 @@ function VotePageContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span>Back to All Chilis</span>
-        </button>
+        <main>
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded"
+            aria-label="Back to all chili entries"
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
+            <span>Back to All Chilis</span>
+          </button>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{chili.name}</h1>
-            <p className="text-lg text-gray-600 mb-4">by {chili.contestant_name}</p>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{chili.name}</h1>
+              <p className="text-lg text-gray-600 mb-4">by {chili.contestant_name}</p>
 
-            {chili.description && (
-              <p className="text-gray-700 mb-4">{chili.description}</p>
-            )}
+              {chili.description && (
+                <p className="text-gray-700 mb-4">{chili.description}</p>
+              )}
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">Spice Level:</span>
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Flame
-                    key={i}
-                    size={16}
-                    fill={i < chili.spice_level ? '#ef4444' : 'none'}
-                    stroke={i < chili.spice_level ? '#ef4444' : '#d1d5db'}
-                  />
-                ))}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-700">Spice Level:</span>
+                <div className="flex gap-1" role="img" aria-label={`${chili.spice_level} out of 5 spice level`}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Flame
+                      key={i}
+                      size={16}
+                      fill={i < chili.spice_level ? '#ef4444' : 'none'}
+                      stroke={i < chili.spice_level ? '#ef4444' : '#d1d5db'}
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-6 space-y-4">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Rate This Chili</h2>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Overall Rating *
+                </label>
+                <StarRating
+                  value={voteData.overallRating}
+                  onChange={(val) => setVoteData({ ...voteData, overallRating: val })}
+                  label="Overall"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Taste *
+                </label>
+                <StarRating
+                  value={voteData.taste}
+                  onChange={(val) => setVoteData({ ...voteData, taste: val })}
+                  label="Taste"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Presentation *
+                </label>
+                <StarRating
+                  value={voteData.presentation}
+                  onChange={(val) => setVoteData({ ...voteData, presentation: val })}
+                  label="Presentation"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Creativity *
+                </label>
+                <StarRating
+                  value={voteData.creativity}
+                  onChange={(val) => setVoteData({ ...voteData, creativity: val })}
+                  label="Creativity"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Spice Balance *
+                </label>
+                <StarRating
+                  value={voteData.spiceBalance}
+                  onChange={(val) => setVoteData({ ...voteData, spiceBalance: val })}
+                  label="Spice Balance"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="vote-comments-textarea" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Comments (optional)
+                </label>
+                <textarea
+                  id="vote-comments-textarea"
+                  value={voteData.comments}
+                  onChange={(e) => setVoteData({ ...voteData, comments: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows={3}
+                  placeholder="Share your thoughts about this chili..."
+                  aria-describedby="vote-comments-hint"
+                />
+                <span id="vote-comments-hint" className="sr-only">Optional comments about your experience with this chili</span>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => router.push('/')}
+                  className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  aria-label="Cancel voting and return to chili list"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitVote}
+                  disabled={voting}
+                  className="flex-1 px-6 py-3 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 disabled:bg-gray-300 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  aria-label="Submit your vote for this chili"
+                  aria-busy={voting}
+                >
+                  {voting ? 'Submitting...' : 'Submit Vote'}
+                </button>
               </div>
             </div>
           </div>
-
-          <div className="border-t pt-6 space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Rate This Chili</h2>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Overall Rating *
-              </label>
-              <StarRating
-                value={voteData.overallRating}
-                onChange={(val) => setVoteData({ ...voteData, overallRating: val })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Taste *
-              </label>
-              <StarRating
-                value={voteData.taste}
-                onChange={(val) => setVoteData({ ...voteData, taste: val })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Presentation *
-              </label>
-              <StarRating
-                value={voteData.presentation}
-                onChange={(val) => setVoteData({ ...voteData, presentation: val })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Creativity *
-              </label>
-              <StarRating
-                value={voteData.creativity}
-                onChange={(val) => setVoteData({ ...voteData, creativity: val })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Spice Balance *
-              </label>
-              <StarRating
-                value={voteData.spiceBalance}
-                onChange={(val) => setVoteData({ ...voteData, spiceBalance: val })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Comments (optional)
-              </label>
-              <textarea
-                value={voteData.comments}
-                onChange={(e) => setVoteData({ ...voteData, comments: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                rows={3}
-                placeholder="Share your thoughts about this chili..."
-              />
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <button
-                onClick={() => router.push('/')}
-                className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitVote}
-                disabled={voting}
-                className="flex-1 px-6 py-3 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 disabled:bg-gray-300 transition-colors"
-              >
-                {voting ? 'Submitting...' : 'Submit Vote'}
-              </button>
-            </div>
-          </div>
-        </div>
+        </main>
       </div>
     </div>
   );
