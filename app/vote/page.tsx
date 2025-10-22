@@ -32,6 +32,7 @@ function VotePageContent() {
 
   useEffect(() => {
     loadChili();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chiliId]);
 
   const loadChili = async () => {

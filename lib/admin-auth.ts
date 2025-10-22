@@ -78,7 +78,7 @@ export class AdminAuth {
       if (!sessionData) return null;
 
       return JSON.parse(sessionData);
-    } catch (error) {
+    } catch {
       return null;
     }
   }

@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import type { ChiliEntry, Vote, ChiliSubmission, VoteSubmission } from '@/types/database';
+import type { ChiliEntry, ChiliSubmission, VoteSubmission } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;

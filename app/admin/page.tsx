@@ -5,7 +5,7 @@ import { ChiliDatabase } from '@/lib/supabase';
 import { QRCodeGenerator } from '@/lib/qr-generator';
 import { AdminAuth } from '@/lib/admin-auth';
 import type { ChiliEntry } from '@/types/database';
-import { QrCode, Plus, ArrowLeft, Printer, Lock, LogOut } from 'lucide-react';
+import { Plus, ArrowLeft, Printer, Lock, LogOut } from 'lucide-react';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -434,7 +434,7 @@ export default function AdminPage() {
           {chilis.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-xl text-gray-600 mb-4">No chili entries yet!</p>
-              <p className="text-gray-500">Click "Add New Chili" above to create your first entry.</p>
+              <p className="text-gray-500">Click &quot;Add New Chili&quot; above to create your first entry.</p>
             </div>
           ) : (
             <div className="space-y-3">

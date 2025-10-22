@@ -264,11 +264,11 @@ export default function Home() {
               <ol className="text-left text-gray-700 space-y-2">
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
-                  <span><strong>Browse</strong> the chili entries below and find one you'd like to vote for</span>
+                  <span><strong>Browse</strong> the chili entries below and find one you&apos;d like to vote for</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
-                  <span><strong>Click "Vote Now"</strong> on any chili that interests you</span>
+                  <span><strong>Click &quot;Vote Now&quot;</strong> on any chili that interests you</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
