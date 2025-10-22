@@ -237,75 +237,84 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <a
-              href="/"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <ArrowLeft size={20} />
-              <span>Back to Voting</span>
-            </a>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage entries, generate QR codes, and monitor voting</p>
-        </div>
+        <main>
+          {/* Header */}
+          <header className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <nav className="flex justify-between items-center mb-4" aria-label="Admin navigation">
+              <a
+                href="/"
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded"
+                aria-label="Back to voting page"
+              >
+                <ArrowLeft size={20} aria-hidden="true" />
+                <span>Back to Voting</span>
+              </a>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                aria-label="Logout from admin dashboard"
+              >
+                <LogOut size={18} aria-hidden="true" />
+                Logout
+              </button>
+            </nav>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">Manage entries, generate QR codes, and monitor voting</p>
+          </header>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" role="region" aria-label="Dashboard statistics">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-red-600">{stats.totalEntries}</p>
+            <p className="text-4xl font-bold text-red-600" aria-label={`${stats.totalEntries} total entries`}>{stats.totalEntries}</p>
             <p className="text-gray-600 font-semibold">Total Entries</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-blue-600">{stats.totalVotes}</p>
+            <p className="text-4xl font-bold text-blue-600" aria-label={`${stats.totalVotes} total votes cast`}>{stats.totalVotes}</p>
             <p className="text-gray-600 font-semibold">Total Votes Cast</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-yellow-600">{stats.testEntries}</p>
+            <p className="text-4xl font-bold text-yellow-600" aria-label={`${stats.testEntries} test entries`}>{stats.testEntries}</p>
             <p className="text-gray-600 font-semibold">Test Entries</p>
           </div>
         </div>
 
         {/* Primary Actions */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+        <section className="bg-white rounded-lg shadow-lg p-6 mb-8" aria-labelledby="quick-actions-heading">
+          <h2 id="quick-actions-heading" className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold"
+              className="flex items-center justify-center gap-3 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              aria-label={showAddForm ? "Close add new chili form" : "Open add new chili form"}
+              aria-expanded={showAddForm}
             >
-              <Plus size={24} />
+              <Plus size={24} aria-hidden="true" />
               <span>Add New Chili</span>
             </button>
 
             <button
               onClick={generateAndPrintQRCodes}
               disabled={loading || chilis.length === 0}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 transition-colors font-semibold"
+              className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 transition-colors font-semibold focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label={`Print QR codes for all ${chilis.length} chili entries`}
+              aria-busy={loading}
             >
-              <Printer size={24} />
+              <Printer size={24} aria-hidden="true" />
               <span>{loading ? 'Generating...' : 'Print QR Codes'}</span>
             </button>
 
             <button
               onClick={handleBulkDeleteTestEntries}
               disabled={loading || stats.testEntries === 0}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold"
+              className="flex items-center justify-center gap-3 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              aria-label={`Delete all ${stats.testEntries} test entries`}
+              aria-busy={loading}
             >
-              <span>🗑️</span>
+              <span aria-hidden="true">🗑️</span>
               <span>Delete Test Entries ({stats.testEntries})</span>
             </button>
           </div>
-        </div>
+        </section>
 
         {/* Add Chili Form */}
         {showAddForm && (
@@ -427,8 +436,8 @@ export default function AdminPage() {
         )}
 
         {/* Chili List */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        <section className="bg-white rounded-lg shadow-lg p-6" aria-labelledby="all-entries-heading">
+          <h2 id="all-entries-heading" className="text-2xl font-bold text-gray-800 mb-4">
             All Entries ({chilis.length})
           </h2>
           {chilis.length === 0 ? (
@@ -439,20 +448,21 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-3">
               {chilis.map((chili) => (
-                <div
+                <article
                   key={chili.id}
                   className={`border-2 rounded-lg p-4 transition-all ${
                     chili.name.startsWith('Test')
                       ? 'border-yellow-300 bg-yellow-50'
                       : 'border-gray-200 bg-white'
                   }`}
+                  aria-label={`${chili.name} by ${chili.contestant_name}`}
                 >
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="text-xl font-bold text-gray-800">{chili.name}</h3>
                         {chili.name.startsWith('Test') && (
-                          <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-semibold">
+                          <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-semibold" role="status">
                             TEST
                           </span>
                         )}
@@ -463,7 +473,7 @@ export default function AdminPage() {
                         <p className="text-sm text-gray-600 mb-2">{chili.description}</p>
                       )}
 
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-4 text-sm flex-wrap">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-700">Votes:</span>
                           <span className="text-gray-600">{chili.vote_count}</span>
@@ -471,36 +481,41 @@ export default function AdminPage() {
                         {chili.vote_count > 0 && (
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-gray-700">Rating:</span>
-                            <span className="text-gray-600">⭐ {chili.average_rating.toFixed(1)}/5</span>
+                            <span className="text-gray-600"><span aria-hidden="true">⭐</span> {chili.average_rating.toFixed(1)}/5</span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-700">Spice:</span>
-                          <span className="text-gray-600">{'🌶️'.repeat(chili.spice_level)}</span>
+                          <span className="text-gray-600" role="img" aria-label={`${chili.spice_level} out of 5 spice level`}>
+                            <span aria-hidden="true">{'🌶️'.repeat(chili.spice_level)}</span>
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex sm:flex-col gap-2 items-stretch sm:items-end">
                       <button
                         onClick={() => handleDeleteChili(chili.id, chili.name)}
                         disabled={loading}
-                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap"
+                        className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        aria-label={`Delete ${chili.name} and its ${chili.vote_count} votes`}
+                        aria-busy={loading}
                       >
-                        🗑️ Delete
+                        <span aria-hidden="true">🗑️</span> Delete
                       </button>
                       {chili.vote_count > 0 && (
-                        <span className="text-xs text-center text-gray-500">
+                        <span className="text-xs text-center text-gray-500 self-center sm:self-auto" aria-hidden="true">
                           {chili.vote_count} vote{chili.vote_count !== 1 ? 's' : ''}
                         </span>
                       )}
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
-        </div>
+        </section>
+        </main>
       </div>
     </div>
   );

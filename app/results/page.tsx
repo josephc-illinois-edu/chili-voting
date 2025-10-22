@@ -84,8 +84,8 @@ export default function ResultsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <TrendingUp className="w-16 h-16 text-red-500 animate-pulse mx-auto mb-4" />
+        <div className="text-center" role="status" aria-live="polite">
+          <TrendingUp className="w-16 h-16 text-red-500 animate-pulse mx-auto mb-4" aria-hidden="true" />
           <p className="text-xl text-gray-600">Loading results...</p>
         </div>
       </div>
@@ -95,82 +95,87 @@ export default function ResultsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 mb-4"
-          >
-            <ArrowLeft size={20} />
-            Back to Voting
-          </a>
-
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Trophy className="w-16 h-16 text-yellow-500" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Live Results</h1>
-            <p className="text-gray-600">
-              {process.env.NEXT_PUBLIC_EVENT_NAME || 'Chili Cook-Off 2025'}
-            </p>
-          </div>
-
-          {/* Real-time Status */}
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <button
-              onClick={() => setRealtimeEnabled(!realtimeEnabled)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                realtimeEnabled
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+        <main>
+          {/* Header */}
+          <div className="mb-8">
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 mb-4 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
+              aria-label="Back to voting page"
             >
-              {realtimeEnabled ? <Wifi size={18} /> : <WifiOff size={18} />}
-              <span className="text-sm font-semibold">
-                Real-time: {realtimeEnabled ? 'ON' : 'OFF'}
-              </span>
-            </button>
-            {realtimeEnabled && (
-              <span className="text-xs text-gray-500">
-                Last update: {lastUpdate.toLocaleTimeString()}
-              </span>
-            )}
+              <ArrowLeft size={20} aria-hidden="true" />
+              Back to Voting
+            </a>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-4">
+                <Trophy className="w-16 h-16 text-yellow-500" aria-hidden="true" />
+              </div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">Live Results</h1>
+              <p className="text-gray-600">
+                {process.env.NEXT_PUBLIC_EVENT_NAME || 'Chili Cook-Off 2025'}
+              </p>
+            </div>
+
+            {/* Real-time Status */}
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <button
+                onClick={() => setRealtimeEnabled(!realtimeEnabled)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors focus:ring-2 focus:ring-offset-2 ${
+                  realtimeEnabled
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200 focus:ring-green-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-gray-400'
+                }`}
+                aria-label={`Toggle real-time updates. Currently ${realtimeEnabled ? 'on' : 'off'}`}
+                aria-pressed={realtimeEnabled}
+              >
+                {realtimeEnabled ? <Wifi size={18} aria-hidden="true" /> : <WifiOff size={18} aria-hidden="true" />}
+                <span className="text-sm font-semibold">
+                  Real-time: {realtimeEnabled ? 'ON' : 'OFF'}
+                </span>
+              </button>
+              {realtimeEnabled && (
+                <span className="text-xs text-gray-500" role="status" aria-live="polite">
+                  Last update: {lastUpdate.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" role="region" aria-label="Voting statistics" aria-live="polite">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-red-600">{stats.totalEntries}</p>
+            <p className="text-3xl font-bold text-red-600" aria-label={`${stats.totalEntries} total entries`}>{stats.totalEntries}</p>
             <p className="text-gray-600">Total Entries</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-red-600">{stats.totalVotes}</p>
+            <p className="text-3xl font-bold text-red-600" aria-label={`${stats.totalVotes} total votes`}>{stats.totalVotes}</p>
             <p className="text-gray-600">Total Votes</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-red-600">{stats.averageVotesPerEntry.toFixed(1)}</p>
+            <p className="text-3xl font-bold text-red-600" aria-label={`${stats.averageVotesPerEntry.toFixed(1)} average votes per entry`}>{stats.averageVotesPerEntry.toFixed(1)}</p>
             <p className="text-gray-600">Avg Votes/Entry</p>
           </div>
         </div>
 
         {/* Leaderboard */}
-        <div className="space-y-4">
+        <div className="space-y-4" role="region" aria-label="Chili competition leaderboard" aria-live="polite">
           {chilis.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <p className="text-xl text-gray-600">No results yet. Start voting!</p>
             </div>
           ) : (
             chilis.map((chili, index) => (
-              <div
+              <article
                 key={chili.id}
                 className={`bg-white rounded-lg shadow-md p-6 transition-all ${
                   index < 3 ? 'ring-2 ring-yellow-400' : ''
                 }`}
+                aria-label={`Rank ${index + 1}: ${chili.name} by ${chili.contestant_name}`}
               >
                 <div className="flex items-start gap-4">
                   {/* Rank/Medal */}
-                  <div className="flex-shrink-0 w-12 text-center">
+                  <div className="flex-shrink-0 w-12 text-center" aria-hidden="true">
                     {index < 3 ? (
                       getMedalIcon(index)
                     ) : (
@@ -190,13 +195,14 @@ export default function ResultsPage() {
                     {/* Spice Level */}
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-sm text-gray-600">Spice Level:</span>
-                      <div className="flex gap-0.5">
+                      <div className="flex gap-0.5" role="img" aria-label={`${chili.spice_level} out of 5 spice level`}>
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Flame
                             key={i}
                             size={14}
                             fill={i < chili.spice_level ? '#ef4444' : 'none'}
                             stroke={i < chili.spice_level ? '#ef4444' : '#d1d5db'}
+                            aria-hidden="true"
                           />
                         ))}
                       </div>
@@ -205,26 +211,28 @@ export default function ResultsPage() {
                     {/* Voting Stats */}
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
-                        <Star size={20} fill="#fbbf24" stroke="#fbbf24" />
+                        <Star size={20} fill="#fbbf24" stroke="#fbbf24" aria-hidden="true" />
+                        <span className="sr-only">Average rating: </span>
                         <span className="text-xl font-bold text-gray-800">
                           {chili.vote_count > 0 ? chili.average_rating.toFixed(1) : 'N/A'}
                         </span>
                       </div>
                       <div className="text-gray-600">
-                        <span className="font-semibold">{chili.vote_count}</span> votes
+                        <span className="font-semibold">{chili.vote_count}</span> vote{chili.vote_count !== 1 ? 's' : ''}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </article>
             ))
           )}
         </div>
 
         {/* Last Updated */}
-        <div className="text-center mt-8 text-sm text-gray-500">
+        <div className="text-center mt-8 text-sm text-gray-500" role="status" aria-live="polite">
           Last updated: {new Date().toLocaleTimeString()}
         </div>
+        </main>
       </div>
     </div>
   );
