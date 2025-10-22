@@ -1,0 +1,380 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ChiliDatabase } from '@/lib/supabase';
+import { SessionManager } from '@/lib/session';
+import type { ChiliEntry, VoteSubmission } from '@/types/database';
+import { Flame, Star, ChevronRight } from 'lucide-react';
+
+export default function Home() {
+  const [chilis, setChilis] = useState<ChiliEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedChili, setSelectedChili] = useState<ChiliEntry | null>(null);
+  const [voting, setVoting] = useState(false);
+  const [voteData, setVoteData] = useState({
+    overallRating: 0,
+    taste: 0,
+    presentation: 0,
+    creativity: 0,
+    spiceBalance: 0,
+    comments: ''
+  });
+
+  useEffect(() => {
+    loadChilis();
+  }, []);
+
+  const loadChilis = async () => {
+    try {
+      const entries = await ChiliDatabase.getChiliEntries();
+      setChilis(entries);
+    } catch (error) {
+      console.error('Error loading chilis:', error);
+      alert('Failed to load chili entries. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVoteClick = (chili: ChiliEntry) => {
+    if (SessionManager.hasVoted(chili.id)) {
+      alert('You have already voted for this chili!');
+      return;
+    }
+    setSelectedChili(chili);
+  };
+
+  const submitVote = async () => {
+    if (!selectedChili) return;
+
+    if (voteData.overallRating === 0 || voteData.taste === 0 ||
+        voteData.presentation === 0 || voteData.creativity === 0 ||
+        voteData.spiceBalance === 0) {
+      alert('Please rate all categories before submitting.');
+      return;
+    }
+
+    setVoting(true);
+    try {
+      const sessionId = SessionManager.getSessionId();
+      const submission: VoteSubmission & { sessionId: string } = {
+        chiliId: selectedChili.id,
+        sessionId,
+        overallRating: voteData.overallRating,
+        categoryRatings: {
+          taste: voteData.taste,
+          presentation: voteData.presentation,
+          creativity: voteData.creativity,
+          spiceBalance: voteData.spiceBalance
+        },
+        comments: voteData.comments
+      };
+
+      await ChiliDatabase.submitVote(submission);
+      SessionManager.markAsVoted(selectedChili.id);
+
+      alert('Vote submitted successfully!');
+      setSelectedChili(null);
+      setVoteData({
+        overallRating: 0,
+        taste: 0,
+        presentation: 0,
+        creativity: 0,
+        spiceBalance: 0,
+        comments: ''
+      });
+      loadChilis(); // Refresh to show updated stats
+    } catch (error) {
+      console.error('Error submitting vote:', error);
+      alert('Failed to submit vote. Please try again.');
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const StarRating = ({ value, onChange }: { value: number; onChange: (val: number) => void }) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className="focus:outline-none"
+          >
+            <Star
+              size={32}
+              fill={star <= value ? '#fbbf24' : 'none'}
+              stroke={star <= value ? '#fbbf24' : '#d1d5db'}
+              className="cursor-pointer transition-colors"
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <Flame className="w-16 h-16 text-red-500 animate-bounce mx-auto mb-4" />
+          <p className="text-xl text-gray-600">Loading chili entries...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedChili) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{selectedChili.name}</h1>
+            <p className="text-lg text-gray-600 mb-4">by {selectedChili.contestant_name}</p>
+
+            {selectedChili.description && (
+              <p className="text-gray-700 mb-4">{selectedChili.description}</p>
+            )}
+
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-semibold text-gray-700">Spice Level:</span>
+                <div className="flex gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Flame
+                      key={i}
+                      size={16}
+                      fill={i < selectedChili.spice_level ? '#ef4444' : 'none'}
+                      stroke={i < selectedChili.spice_level ? '#ef4444' : '#d1d5db'}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Overall Rating *
+                </label>
+                <StarRating
+                  value={voteData.overallRating}
+                  onChange={(val) => setVoteData({ ...voteData, overallRating: val })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Taste *
+                </label>
+                <StarRating
+                  value={voteData.taste}
+                  onChange={(val) => setVoteData({ ...voteData, taste: val })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Presentation *
+                </label>
+                <StarRating
+                  value={voteData.presentation}
+                  onChange={(val) => setVoteData({ ...voteData, presentation: val })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Creativity *
+                </label>
+                <StarRating
+                  value={voteData.creativity}
+                  onChange={(val) => setVoteData({ ...voteData, creativity: val })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Spice Balance *
+                </label>
+                <StarRating
+                  value={voteData.spiceBalance}
+                  onChange={(val) => setVoteData({ ...voteData, spiceBalance: val })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Comments (optional)
+                </label>
+                <textarea
+                  value={voteData.comments}
+                  onChange={(e) => setVoteData({ ...voteData, comments: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows={3}
+                  placeholder="Share your thoughts about this chili..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setSelectedChili(null)}
+                  className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitVote}
+                  disabled={voting}
+                  className="flex-1 px-6 py-3 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 disabled:bg-gray-300 transition-colors"
+                >
+                  {voting ? 'Submitting...' : 'Submit Vote'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Flame className="w-20 h-20 text-red-500" />
+            </div>
+            <h1 className="text-5xl font-bold text-gray-800 mb-3">
+              {process.env.NEXT_PUBLIC_EVENT_NAME || 'Chili Cook-Off 2025'}
+            </h1>
+            <p className="text-xl text-gray-600 mb-2">
+              {process.env.NEXT_PUBLIC_EVENT_DATE || 'November 19, 2025'}
+            </p>
+            <p className="text-lg text-gray-600 mb-6">
+              {process.env.NEXT_PUBLIC_EVENT_TIME || '11:00 AM – 1:30 PM'}
+            </p>
+
+            {/* Instructions */}
+            <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
+              <h2 className="text-2xl font-bold text-red-800 mb-3">How to Vote</h2>
+              <ol className="text-left text-gray-700 space-y-2">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                  <span><strong>Browse</strong> the chili entries below and find one you'd like to vote for</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                  <span><strong>Click "Vote Now"</strong> on any chili that interests you</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                  <span><strong>Rate</strong> the chili in 5 categories using the star system</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</span>
+                  <span><strong>Submit</strong> your vote and check out the live results!</span>
+                </li>
+              </ol>
+              <p className="mt-4 text-sm text-gray-600">
+                💡 <strong>Tip:</strong> You can vote for multiple chilis, but only once per chili!
+              </p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4">
+              <a
+                href="/results"
+                className="px-8 py-3 bg-red-500 text-white rounded-md shadow hover:shadow-lg hover:bg-red-600 transition-all font-bold text-lg"
+              >
+                🏆 View Live Results
+              </a>
+              <a
+                href="/admin"
+                className="px-8 py-3 bg-gray-700 text-white rounded-md shadow hover:shadow-lg hover:bg-gray-800 transition-all font-bold text-lg"
+              >
+                🔐 Admin Panel
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Chili Entries Section */}
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">
+            Chili Entries ({chilis.length})
+          </h2>
+          <p className="text-center text-gray-600 mb-6">
+            Click on any chili below to cast your vote!
+          </p>
+        </div>
+
+        {chilis.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-xl text-gray-600">No chili entries yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {chilis.map((chili) => {
+              const hasVoted = SessionManager.hasVoted(chili.id);
+              return (
+                <div
+                  key={chili.id}
+                  className={`bg-white rounded-lg shadow-md p-6 transition-all ${
+                    hasVoted ? 'opacity-60' : 'hover:shadow-lg'
+                  }`}
+                >
+                  <h2 className="text-xl font-bold text-gray-800 mb-2">{chili.name}</h2>
+                  <p className="text-gray-600 mb-3">by {chili.contestant_name}</p>
+
+                  {chili.description && (
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{chili.description}</p>
+                  )}
+
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xs font-semibold text-gray-600">Spice:</span>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Flame
+                          key={i}
+                          size={14}
+                          fill={i < chili.spice_level ? '#ef4444' : 'none'}
+                          stroke={i < chili.spice_level ? '#ef4444' : '#d1d5db'}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+                    <span>{chili.vote_count} votes</span>
+                    {chili.vote_count > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Star size={14} fill="#fbbf24" stroke="#fbbf24" />
+                        {chili.average_rating.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleVoteClick(chili)}
+                    disabled={hasVoted}
+                    className={`w-full py-2 rounded-md font-semibold flex items-center justify-center gap-2 transition-colors ${
+                      hasVoted
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : 'bg-red-500 text-white hover:bg-red-600'
+                    }`}
+                  >
+                    {hasVoted ? 'Already Voted' : 'Vote Now'}
+                    {!hasVoted && <ChevronRight size={18} />}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
