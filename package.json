@@ -13,6 +13,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^5.0.1",
     "@supabase/supabase-js": "^2.76.1",
     "@types/qrcode": "^1.5.5",
     "lucide-react": "^0.546.0",

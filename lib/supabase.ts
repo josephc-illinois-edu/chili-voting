@@ -5,6 +5,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { ChiliEntry, ChiliSubmission, VoteSubmission } from '@/types/database';
+import { AdminAuth } from './admin-auth';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -39,17 +40,40 @@ export class ChiliDatabase {
 
   /**
    * Submit a new vote for a chili
-   * @param vote Vote submission data
-   * @throws Error if vote submission fails
+   * @param vote Vote submission data with device fingerprint
+   * @throws Error if vote submission fails or ballot stuffing detected
    */
-  static async submitVote(vote: VoteSubmission & { sessionId: string }): Promise<void> {
+  static async submitVote(vote: VoteSubmission & {
+    sessionId: string;
+    deviceFingerprint?: string;
+    ipAddress?: string;
+  }): Promise<void> {
     try {
+      // Admin bypass: Skip validation for authenticated admins
+      const isAdmin = AdminAuth.isAuthenticated();
+
+      // Multi-layer ballot stuffing validation (skip for admins)
+      if (!isAdmin && vote.deviceFingerprint) {
+        const validation = await this.validateVote(
+          vote.chiliId,
+          vote.sessionId,
+          vote.deviceFingerprint,
+          vote.ipAddress
+        );
+
+        if (!validation.allowed) {
+          throw new Error(validation.reason || 'Duplicate vote detected');
+        }
+      }
+
       // Insert the vote
       const { error: voteError } = await supabase
         .from('votes')
         .insert({
           chili_id: vote.chiliId,
           session_id: vote.sessionId,
+          device_fingerprint: vote.deviceFingerprint || null,
+          ip_address: vote.ipAddress || null,
           overall_rating: vote.overallRating,
           taste_rating: vote.categoryRatings.taste,
           presentation_rating: vote.categoryRatings.presentation,
@@ -67,7 +91,76 @@ export class ChiliDatabase {
 
     } catch (error) {
       console.error('Error submitting vote:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
       throw new Error('Failed to submit vote');
+    }
+  }
+
+  /**
+   * Validate vote to prevent ballot stuffing
+   * @param chiliId Chili entry ID
+   * @param sessionId Session identifier
+   * @param deviceFingerprint Browser fingerprint
+   * @param ipAddress Optional IP address
+   * @returns Validation result
+   */
+  static async validateVote(
+    chiliId: string,
+    sessionId: string,
+    deviceFingerprint: string,
+    ipAddress?: string
+  ): Promise<{ allowed: boolean; reason?: string }> {
+    try {
+      // Check 1: Session ID
+      const sessionVote = await supabase
+        .from('votes')
+        .select('id')
+        .eq('session_id', sessionId)
+        .eq('chili_id', chiliId)
+        .maybeSingle();
+
+      if (sessionVote.data) {
+        return { allowed: false, reason: 'You have already voted for this chili' };
+      }
+
+      // Check 2: Device Fingerprint (PRIMARY CHECK)
+      const fingerprintVote = await supabase
+        .from('votes')
+        .select('id')
+        .eq('device_fingerprint', deviceFingerprint)
+        .eq('chili_id', chiliId)
+        .maybeSingle();
+
+      if (fingerprintVote.data) {
+        return { allowed: false, reason: 'This device has already voted for this chili' };
+      }
+
+      // Check 3: IP Address (recent vote from same IP - within 5 minutes)
+      if (ipAddress) {
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const recentIPVote = await supabase
+          .from('votes')
+          .select('id')
+          .eq('ip_address', ipAddress)
+          .eq('chili_id', chiliId)
+          .gte('created_at', fiveMinutesAgo)
+          .maybeSingle();
+
+        if (recentIPVote.data) {
+          return {
+            allowed: false,
+            reason: 'Multiple votes detected from this network. Please wait a few minutes.'
+          };
+        }
+      }
+
+      return { allowed: true };
+    } catch (error) {
+      console.error('Error validating vote:', error);
+      // On validation error, allow the vote (fail open)
+      return { allowed: true };
     }
   }
 

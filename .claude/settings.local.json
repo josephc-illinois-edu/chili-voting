@@ -18,7 +18,9 @@
       "Bash(netstat:*)",
       "Bash(taskkill //F //PID 1908)",
       "Bash(NEXT_PUBLIC_SUPABASE_URL=https://owsrwqoulmhozoblnwjn.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93c3J3cW91bG1ob3pvYmxud2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDAzMzQsImV4cCI6MjA3NjcxNjMzNH0.veZvop8bgT-86b80sMZ3pAwqqr_STbttumTt7rmNK5M npx tsx:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

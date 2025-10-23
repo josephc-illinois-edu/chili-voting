@@ -22,6 +22,10 @@ export default function Home() {
 
   useEffect(() => {
     loadChilis();
+    // Initialize device fingerprinting on page load
+    SessionManager.initFingerprint().catch(err => {
+      console.error('Failed to initialize fingerprint:', err);
+    });
   }, []);
 
   const loadChilis = async () => {
@@ -57,9 +61,15 @@ export default function Home() {
     setVoting(true);
     try {
       const sessionId = SessionManager.getSessionId();
-      const submission: VoteSubmission & { sessionId: string } = {
+      const deviceFingerprint = await SessionManager.getFingerprint();
+
+      const submission: VoteSubmission & {
+        sessionId: string;
+        deviceFingerprint?: string;
+      } = {
         chiliId: selectedChili.id,
         sessionId,
+        deviceFingerprint,
         overallRating: voteData.overallRating,
         categoryRatings: {
           taste: voteData.taste,
@@ -86,7 +96,9 @@ export default function Home() {
       loadChilis(); // Refresh to show updated stats
     } catch (error) {
       console.error('Error submitting vote:', error);
-      alert('Failed to submit vote. Please try again.');
+      // Show specific error message if available
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit vote. Please try again.';
+      alert(errorMessage);
     } finally {
       setVoting(false);
     }
