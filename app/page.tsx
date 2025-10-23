@@ -364,16 +364,29 @@ export default function Home() {
               return (
                 <div
                   key={chili.id}
-                  className={`bg-white rounded-lg shadow-md p-6 transition-all ${
+                  className={`bg-white rounded-lg shadow-md overflow-hidden transition-all ${
                     hasVoted ? 'opacity-60' : 'hover:shadow-lg'
                   }`}
                 >
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">{chili.name}</h2>
-                  <p className="text-gray-600 mb-3">by {chili.contestant_name}</p>
-
-                  {chili.description && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{chili.description}</p>
+                  {/* Photo Display */}
+                  {chili.photo_url && (
+                    <div className="aspect-video w-full bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={chili.photo_url}
+                        alt={`${chili.name} by ${chili.contestant_name}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   )}
+
+                  <div className="p-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">{chili.name}</h2>
+                    <p className="text-gray-600 mb-3">by {chili.contestant_name}</p>
+
+                    {chili.description && (
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{chili.description}</p>
+                    )}
 
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xs font-semibold text-gray-600">Spice:</span>
@@ -401,20 +414,21 @@ export default function Home() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => handleVoteClick(chili)}
-                    disabled={hasVoted}
-                    className={`w-full py-2 rounded-md font-semibold flex items-center justify-center gap-2 transition-colors focus:ring-2 focus:ring-offset-2 ${
-                      hasVoted
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed focus:ring-gray-400'
-                        : 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500'
-                    }`}
-                    aria-label={hasVoted ? `Already voted for ${chili.name}` : `Vote for ${chili.name} by ${chili.contestant_name}`}
-                    aria-disabled={hasVoted}
-                  >
-                    {hasVoted ? 'Already Voted' : 'Vote Now'}
-                    {!hasVoted && <ChevronRight size={18} aria-hidden="true" />}
-                  </button>
+                    <button
+                      onClick={() => handleVoteClick(chili)}
+                      disabled={hasVoted}
+                      className={`w-full py-2 rounded-md font-semibold flex items-center justify-center gap-2 transition-colors focus:ring-2 focus:ring-offset-2 ${
+                        hasVoted
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed focus:ring-gray-400'
+                          : 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500'
+                      }`}
+                      aria-label={hasVoted ? `Already voted for ${chili.name}` : `Vote for ${chili.name} by ${chili.contestant_name}`}
+                      aria-disabled={hasVoted}
+                    >
+                      {hasVoted ? 'Already Voted' : 'Vote Now'}
+                      {!hasVoted && <ChevronRight size={18} aria-hidden="true" />}
+                    </button>
+                  </div>
                 </div>
               );
             })}
