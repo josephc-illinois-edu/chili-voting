@@ -494,6 +494,19 @@ export default function AdminPage() {
                           </a>
                         </p>
                       )}
+                      <p className="text-sm text-gray-500 mb-2">
+                        <span className="font-semibold">UUID:</span>{' '}
+                        <code className="bg-gray-100 px-2 py-1 rounded text-xs select-all">{chili.id}</code>
+                        <a
+                          href={`/vote?chili=${chili.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 text-blue-600 hover:text-blue-700 text-xs underline"
+                          aria-label={`Test voting page for ${chili.name}`}
+                        >
+                          Test Vote Page →
+                        </a>
+                      </p>
 
                       {chili.description && (
                         <p className="text-sm text-gray-600 mb-2">{chili.description}</p>
