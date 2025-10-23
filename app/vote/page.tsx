@@ -211,6 +211,20 @@ function VotePageContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Photo Display */}
+              {chili.photo_url && (
+                <div className="mt-6">
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 shadow-md">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={chili.photo_url}
+                      alt={`${chili.name} by ${chili.contestant_name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="border-t pt-6 space-y-4">
