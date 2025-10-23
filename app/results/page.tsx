@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, ChiliDatabase } from '@/lib/supabase';
 import type { ChiliEntry } from '@/types/database';
-import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff } from 'lucide-react';
+import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff, X, Image as ImageIcon } from 'lucide-react';
 
 export default function ResultsPage() {
   const [chilis, setChilis] = useState<ChiliEntry[]>([]);
@@ -11,6 +11,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; name: string } | null>(null);
 
   useEffect(() => {
     loadResults();
@@ -173,7 +174,24 @@ export default function ResultsPage() {
                 }`}
                 aria-label={`Rank ${index + 1}: ${chili.name} by ${chili.contestant_name}`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col md:flex-row items-start gap-4">
+                  {/* Photo */}
+                  {chili.photo_url && (
+                    <button
+                      onClick={() => setLightboxImage({ url: chili.photo_url!, name: chili.name })}
+                      className="flex-shrink-0 w-full md:w-48 aspect-video rounded-lg overflow-hidden bg-gray-100 hover:opacity-90 transition-opacity focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      aria-label={`View photo of ${chili.name}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={chili.photo_url}
+                        alt={`${chili.name} by ${chili.contestant_name}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </button>
+                  )}
+
                   {/* Rank/Medal */}
                   <div className="flex-shrink-0 w-12 text-center" aria-hidden="true">
                     {index < 3 ? (
@@ -185,7 +203,15 @@ export default function ResultsPage() {
 
                   {/* Chili Info */}
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-1">{chili.name}</h2>
+                    <div className="flex items-start gap-2 mb-1">
+                      <h2 className="text-2xl font-bold text-gray-800 flex-1">{chili.name}</h2>
+                      {chili.photo_url && (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold flex items-center gap-1" aria-label="Has photo">
+                          <ImageIcon size={12} aria-hidden="true" />
+                          Photo
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-600 mb-3">by {chili.contestant_name}</p>
 
                     {chili.description && (
@@ -234,6 +260,35 @@ export default function ResultsPage() {
         </div>
         </main>
       </div>
+
+      {/* Lightbox */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          onClick={() => setLightboxImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Photo lightbox"
+        >
+          <button
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 focus:ring-2 focus:ring-white rounded-lg p-2"
+            aria-label="Close lightbox"
+          >
+            <X size={32} />
+          </button>
+          <div className="max-w-5xl max-h-[90vh] relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightboxImage.url}
+              alt={lightboxImage.name}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <p className="text-white text-center mt-4 text-lg font-semibold">{lightboxImage.name}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

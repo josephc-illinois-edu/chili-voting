@@ -16,6 +16,9 @@ export interface ChiliEntry {
   total_score: number;
   average_rating: number;
   created_at: string;
+  entry_code?: string | null;
+  photo_url?: string | null;
+  photo_uploaded_at?: string | null;
 }
 
 export interface Vote {

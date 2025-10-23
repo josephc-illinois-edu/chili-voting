@@ -14,7 +14,7 @@ export default function AdminPage() {
   const [chilis, setChilis] = useState<ChiliEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [stats, setStats] = useState({ totalEntries: 0, totalVotes: 0, testEntries: 0 });
+  const [stats, setStats] = useState({ totalEntries: 0, totalVotes: 0, testEntries: 0, entriesWithPhotos: 0 });
   const [formData, setFormData] = useState({
     name: '',
     contestantName: '',
@@ -62,10 +62,12 @@ export default function AdminPage() {
       setChilis(entries);
 
       const testCount = entries.filter(e => e.name.startsWith('Test')).length;
+      const photosCount = entries.filter(e => e.photo_url).length;
       setStats({
         totalEntries: entries.length,
         totalVotes: votingStats.totalVotes,
-        testEntries: testCount
+        testEntries: testCount,
+        entriesWithPhotos: photosCount
       });
     } catch (error) {
       console.error('Error loading chilis:', error);
@@ -263,7 +265,7 @@ export default function AdminPage() {
           </header>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" role="region" aria-label="Dashboard statistics">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" role="region" aria-label="Dashboard statistics">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <p className="text-4xl font-bold text-red-600" aria-label={`${stats.totalEntries} total entries`}>{stats.totalEntries}</p>
             <p className="text-gray-600 font-semibold">Total Entries</p>
@@ -271,6 +273,10 @@ export default function AdminPage() {
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <p className="text-4xl font-bold text-blue-600" aria-label={`${stats.totalVotes} total votes cast`}>{stats.totalVotes}</p>
             <p className="text-gray-600 font-semibold">Total Votes Cast</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <p className="text-4xl font-bold text-green-600" aria-label={`${stats.entriesWithPhotos} entries with photos`}>{stats.entriesWithPhotos}</p>
+            <p className="text-gray-600 font-semibold">📸 With Photos</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <p className="text-4xl font-bold text-yellow-600" aria-label={`${stats.testEntries} test entries`}>{stats.testEntries}</p>
@@ -466,8 +472,28 @@ export default function AdminPage() {
                             TEST
                           </span>
                         )}
+                        {chili.photo_url && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold" role="status" aria-label="Photo uploaded">
+                            📸 Photo
+                          </span>
+                        )}
                       </div>
                       <p className="text-gray-600 mb-2">by {chili.contestant_name}</p>
+                      {chili.entry_code && (
+                        <p className="text-sm text-gray-500 mb-2">
+                          <span className="font-semibold">Code:</span>{' '}
+                          <code className="bg-gray-100 px-2 py-1 rounded text-xs">{chili.entry_code}</code>
+                          <a
+                            href={`/upload/${chili.entry_code}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 text-blue-600 hover:text-blue-700 text-xs underline"
+                            aria-label={`View upload page for ${chili.name}`}
+                          >
+                            View Upload Page →
+                          </a>
+                        </p>
+                      )}
 
                       {chili.description && (
                         <p className="text-sm text-gray-600 mb-2">{chili.description}</p>
