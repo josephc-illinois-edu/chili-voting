@@ -207,6 +207,34 @@ export class ChiliDatabase {
    */
   static async submitChiliEntry(entry: ChiliSubmission): Promise<void> {
     try {
+      // Import entry code utilities dynamically to avoid circular dependencies
+      const { generateEntryCode } = await import('./entry-codes');
+
+      // Generate unique entry code
+      let entryCode = generateEntryCode();
+      let codeIsUnique = false;
+      let attempts = 0;
+      const MAX_ATTEMPTS = 10;
+
+      while (!codeIsUnique && attempts < MAX_ATTEMPTS) {
+        const { data: existing } = await supabase
+          .from('chili_entries')
+          .select('entry_code')
+          .eq('entry_code', entryCode)
+          .single();
+
+        if (!existing) {
+          codeIsUnique = true;
+        } else {
+          entryCode = generateEntryCode();
+          attempts++;
+        }
+      }
+
+      if (!codeIsUnique) {
+        throw new Error('Failed to generate unique entry code after multiple attempts');
+      }
+
       const { error } = await supabase
         .from('chili_entries')
         .insert({
@@ -216,7 +244,8 @@ export class ChiliDatabase {
           ingredients: entry.ingredients ? entry.ingredients.split(',').map(i => i.trim()).filter(i => i) : [],
           allergens: entry.allergens ? entry.allergens.split(',').map(a => a.trim()).filter(a => a) : [],
           spice_level: entry.spiceLevel,
-          description: entry.description?.trim() || null
+          description: entry.description?.trim() || null,
+          entry_code: entryCode
         });
 
       if (error) {
