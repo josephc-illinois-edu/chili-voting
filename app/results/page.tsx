@@ -5,9 +5,23 @@ import { supabase, ChiliDatabase } from '@/lib/supabase';
 import type { ChiliEntry } from '@/types/database';
 import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff, X, Image as ImageIcon } from 'lucide-react';
 
+interface CategoryWinner {
+  chiliId: string;
+  chiliName: string;
+  contestantName: string;
+  avgScore: number;
+  voteCount: number;
+}
+
 export default function ResultsPage() {
   const [chilis, setChilis] = useState<ChiliEntry[]>([]);
   const [stats, setStats] = useState({ totalEntries: 0, totalVotes: 0, averageVotesPerEntry: 0 });
+  const [categoryWinners, setCategoryWinners] = useState<{
+    taste: CategoryWinner | null;
+    presentation: CategoryWinner | null;
+    creativity: CategoryWinner | null;
+    spiceBalance: CategoryWinner | null;
+  }>({ taste: null, presentation: null, creativity: null, spiceBalance: null });
   const [loading, setLoading] = useState(true);
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -62,12 +76,14 @@ export default function ResultsPage() {
 
   const loadResults = async () => {
     try {
-      const [entries, votingStats] = await Promise.all([
+      const [entries, votingStats, categoryLeaders] = await Promise.all([
         ChiliDatabase.getChiliEntries(),
-        ChiliDatabase.getVotingStats()
+        ChiliDatabase.getVotingStats(),
+        ChiliDatabase.getCategoryLeaders()
       ]);
       setChilis(entries);
       setStats(votingStats);
+      setCategoryWinners(categoryLeaders);
     } catch (error) {
       console.error('Error loading results:', error);
     } finally {
@@ -157,6 +173,86 @@ export default function ResultsPage() {
             <p className="text-3xl font-bold text-red-600" aria-label={`${stats.averageVotesPerEntry.toFixed(1)} average votes per entry`}>{stats.averageVotesPerEntry.toFixed(1)}</p>
             <p className="text-gray-600">Avg Votes/Entry</p>
           </div>
+        </div>
+
+        {/* Category Winners */}
+        {stats.totalVotes > 0 && (
+          <div className="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg shadow-lg p-6" role="region" aria-label="Category champions" aria-live="polite">
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6 flex items-center justify-center gap-2">
+              <Star className="w-7 h-7 text-yellow-500" aria-hidden="true" />
+              Category Champions
+              <Star className="w-7 h-7 text-yellow-500" aria-hidden="true" />
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Best Taste */}
+              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
+                <div className="text-4xl mb-2" aria-hidden="true">👅</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Taste</h3>
+                {categoryWinners.taste ? (
+                  <>
+                    <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.taste.avgScore}</p>
+                    <p className="text-sm font-semibold text-gray-700">{categoryWinners.taste.chiliName}</p>
+                    <p className="text-xs text-gray-500">by {categoryWinners.taste.contestantName}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">No votes yet</p>
+                )}
+              </div>
+
+              {/* Best Presentation */}
+              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
+                <div className="text-4xl mb-2" aria-hidden="true">🎨</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Presentation</h3>
+                {categoryWinners.presentation ? (
+                  <>
+                    <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.presentation.avgScore}</p>
+                    <p className="text-sm font-semibold text-gray-700">{categoryWinners.presentation.chiliName}</p>
+                    <p className="text-xs text-gray-500">by {categoryWinners.presentation.contestantName}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">No votes yet</p>
+                )}
+              </div>
+
+              {/* Best Creativity */}
+              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
+                <div className="text-4xl mb-2" aria-hidden="true">💡</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Creativity</h3>
+                {categoryWinners.creativity ? (
+                  <>
+                    <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.creativity.avgScore}</p>
+                    <p className="text-sm font-semibold text-gray-700">{categoryWinners.creativity.chiliName}</p>
+                    <p className="text-xs text-gray-500">by {categoryWinners.creativity.contestantName}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">No votes yet</p>
+                )}
+              </div>
+
+              {/* Best Spice Balance */}
+              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
+                <div className="text-4xl mb-2" aria-hidden="true">🌶️</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Spice Balance</h3>
+                {categoryWinners.spiceBalance ? (
+                  <>
+                    <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.spiceBalance.avgScore}</p>
+                    <p className="text-sm font-semibold text-gray-700">{categoryWinners.spiceBalance.chiliName}</p>
+                    <p className="text-xs text-gray-500">by {categoryWinners.spiceBalance.contestantName}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">No votes yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Overall Leaderboard */}
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-800 text-center flex items-center justify-center gap-2">
+            <Trophy className="w-7 h-7 text-yellow-500" aria-hidden="true" />
+            Overall Leaderboard
+          </h2>
         </div>
 
         {/* Leaderboard */}

@@ -353,4 +353,152 @@ export class ChiliDatabase {
       throw new Error('Failed to delete test entries');
     }
   }
+
+  /**
+   * Get category leaders with average scores
+   * @returns Promise with winners for each category
+   */
+  static async getCategoryLeaders(): Promise<{
+    taste: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null;
+    presentation: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null;
+    creativity: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null;
+    spiceBalance: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null;
+  }> {
+    try {
+      // Get all votes with chili info
+      const { data: votes, error } = await supabase
+        .from('votes')
+        .select(`
+          chili_id,
+          taste_rating,
+          presentation_rating,
+          creativity_rating,
+          spice_balance_rating,
+          chili_entries!inner (
+            id,
+            name,
+            contestant_name
+          )
+        `);
+
+      if (error) throw error;
+
+      if (!votes || votes.length === 0) {
+        return { taste: null, presentation: null, creativity: null, spiceBalance: null };
+      }
+
+      // Calculate averages per chili for each category
+      const chiliScores: {
+        [chiliId: string]: {
+          name: string;
+          contestantName: string;
+          taste: number[];
+          presentation: number[];
+          creativity: number[];
+          spiceBalance: number[];
+        };
+      } = {};
+
+      votes.forEach((vote) => {
+        const chiliId = vote.chili_id;
+        const chiliInfo = Array.isArray(vote.chili_entries) ? vote.chili_entries[0] : vote.chili_entries;
+
+        if (!chiliScores[chiliId]) {
+          chiliScores[chiliId] = {
+            name: chiliInfo.name,
+            contestantName: chiliInfo.contestant_name,
+            taste: [],
+            presentation: [],
+            creativity: [],
+            spiceBalance: []
+          };
+        }
+
+        chiliScores[chiliId].taste.push(vote.taste_rating);
+        chiliScores[chiliId].presentation.push(vote.presentation_rating);
+        chiliScores[chiliId].creativity.push(vote.creativity_rating);
+        chiliScores[chiliId].spiceBalance.push(vote.spice_balance_rating);
+      });
+
+      // Calculate averages and find winners
+      const categoryAverages: {
+        [chiliId: string]: {
+          name: string;
+          contestantName: string;
+          taste: number;
+          presentation: number;
+          creativity: number;
+          spiceBalance: number;
+          voteCount: number;
+        };
+      } = {};
+
+      Object.entries(chiliScores).forEach(([chiliId, scores]) => {
+        categoryAverages[chiliId] = {
+          name: scores.name,
+          contestantName: scores.contestantName,
+          taste: scores.taste.reduce((a, b) => a + b, 0) / scores.taste.length,
+          presentation: scores.presentation.reduce((a, b) => a + b, 0) / scores.presentation.length,
+          creativity: scores.creativity.reduce((a, b) => a + b, 0) / scores.creativity.length,
+          spiceBalance: scores.spiceBalance.reduce((a, b) => a + b, 0) / scores.spiceBalance.length,
+          voteCount: scores.taste.length
+        };
+      });
+
+      // Find winners for each category
+      let tasteWinner: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null = null;
+      let presentationWinner: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null = null;
+      let creativityWinner: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null = null;
+      let spiceBalanceWinner: { chiliId: string; chiliName: string; contestantName: string; avgScore: number; voteCount: number } | null = null;
+
+      Object.entries(categoryAverages).forEach(([chiliId, scores]) => {
+        if (!tasteWinner || scores.taste > tasteWinner.avgScore) {
+          tasteWinner = {
+            chiliId,
+            chiliName: scores.name,
+            contestantName: scores.contestantName,
+            avgScore: Math.round(scores.taste * 10) / 10,
+            voteCount: scores.voteCount
+          };
+        }
+        if (!presentationWinner || scores.presentation > presentationWinner.avgScore) {
+          presentationWinner = {
+            chiliId,
+            chiliName: scores.name,
+            contestantName: scores.contestantName,
+            avgScore: Math.round(scores.presentation * 10) / 10,
+            voteCount: scores.voteCount
+          };
+        }
+        if (!creativityWinner || scores.creativity > creativityWinner.avgScore) {
+          creativityWinner = {
+            chiliId,
+            chiliName: scores.name,
+            contestantName: scores.contestantName,
+            avgScore: Math.round(scores.creativity * 10) / 10,
+            voteCount: scores.voteCount
+          };
+        }
+        if (!spiceBalanceWinner || scores.spiceBalance > spiceBalanceWinner.avgScore) {
+          spiceBalanceWinner = {
+            chiliId,
+            chiliName: scores.name,
+            contestantName: scores.contestantName,
+            avgScore: Math.round(scores.spiceBalance * 10) / 10,
+            voteCount: scores.voteCount
+          };
+        }
+      });
+
+      return {
+        taste: tasteWinner,
+        presentation: presentationWinner,
+        creativity: creativityWinner,
+        spiceBalance: spiceBalanceWinner
+      };
+    } catch (error) {
+      console.error('Error fetching category leaders:', error);
+      return { taste: null, presentation: null, creativity: null, spiceBalance: null };
+    }
+  }
 }
