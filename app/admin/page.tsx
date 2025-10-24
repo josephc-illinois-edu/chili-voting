@@ -5,7 +5,8 @@ import { ChiliDatabase } from '@/lib/supabase';
 import { QRCodeGenerator } from '@/lib/qr-generator';
 import { AdminAuth } from '@/lib/admin-auth';
 import type { ChiliEntry } from '@/types/database';
-import { Plus, ArrowLeft, Printer, Lock, LogOut } from 'lucide-react';
+import { Plus, ArrowLeft, Printer, Lock, LogOut, Edit2 } from 'lucide-react';
+import AdminEditModal from '@/components/AdminEditModal';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,6 +25,8 @@ export default function AdminPage() {
     spiceLevel: 3,
     description: ''
   });
+  const [editingEntry, setEditingEntry] = useState<ChiliEntry | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     // Check if already authenticated
@@ -172,6 +175,29 @@ export default function AdminPage() {
       alert('Error generating QR codes. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenEditModal = (entry: ChiliEntry) => {
+    setEditingEntry(entry);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingEntry(null);
+  };
+
+  const handleSaveEdit = async (updatedFields: Partial<ChiliEntry>) => {
+    if (!editingEntry) return;
+
+    try {
+      await ChiliDatabase.updateChiliEntry(editingEntry.id, updatedFields);
+      alert('Entry updated successfully!');
+      loadChilis();
+    } catch (error) {
+      console.error('Error updating entry:', error);
+      throw error; // Re-throw to let modal handle the error
     }
   };
 
@@ -534,6 +560,16 @@ export default function AdminPage() {
 
                     <div className="flex sm:flex-col gap-2 items-stretch sm:items-end">
                       <button
+                        onClick={() => handleOpenEditModal(chili)}
+                        disabled={loading}
+                        className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                        aria-label={`Edit ${chili.name}`}
+                        aria-busy={loading}
+                      >
+                        <Edit2 size={16} aria-hidden="true" />
+                        Edit
+                      </button>
+                      <button
                         onClick={() => handleDeleteChili(chili.id, chili.name)}
                         disabled={loading}
                         className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -556,6 +592,16 @@ export default function AdminPage() {
         </section>
         </main>
       </div>
+
+      {/* Edit Modal */}
+      {editingEntry && (
+        <AdminEditModal
+          entry={editingEntry}
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveEdit}
+        />
+      )}
     </div>
   );
 }

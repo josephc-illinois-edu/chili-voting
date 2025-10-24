@@ -8,6 +8,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Camera, Upload, AlertCircle, CheckCircle, Clock, Edit2, Save, X } from 'lucide-react';
+import RichTextEditor from '@/components/RichTextEditor';
+import IngredientsList from '@/components/IngredientsList';
+import { parseIngredientsList } from '@/lib/text-utils';
+import { validateSafe, entryUpdateSchema } from '@/lib/validation';
 
 interface EntryData {
   id: string;
@@ -57,6 +61,7 @@ export default function UploadPage() {
     spiceLevel: 3,
     description: '',
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Fetch entry data
   useEffect(() => {
@@ -194,6 +199,30 @@ export default function UploadPage() {
 
     setError('');
     setSuccess('');
+    setValidationErrors({});
+
+    // Validate input data
+    const validationResult = validateSafe(entryUpdateSchema, {
+      entryCode: code,
+      name: editData.name,
+      recipe: editData.recipe,
+      ingredients: editData.ingredients,
+      allergens: editData.allergens,
+      spiceLevel: editData.spiceLevel,
+      description: editData.description,
+    });
+
+    if (!validationResult.success) {
+      // Convert errors to object for display
+      const errorObj: Record<string, string> = {};
+      validationResult.errors.forEach(err => {
+        errorObj[err.field] = err.message;
+      });
+      setValidationErrors(errorObj);
+      setError('Please fix the validation errors below');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -202,10 +231,7 @@ export default function UploadPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          entryCode: code,
-          ...editData,
-        }),
+        body: JSON.stringify(validationResult.data),
       });
 
       const data = await response.json();
@@ -231,6 +257,7 @@ export default function UploadPage() {
       setSuccess('Entry updated successfully! ✓');
       setIsEditing(false);
       setUploading(false);
+      setValidationErrors({});
 
       // Scroll to top to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -500,22 +527,30 @@ export default function UploadPage() {
                   type="text"
                   value={editData.name}
                   onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+                    validationErrors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   disabled={!uploadAllowed}
                 />
+                {validationErrors.name && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.name}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Recipe / Preparation Method
                 </label>
-                <textarea
+                <RichTextEditor
                   value={editData.recipe}
-                  onChange={(e) => setEditData({ ...editData, recipe: e.target.value })}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  onChange={(html) => setEditData({ ...editData, recipe: html })}
+                  placeholder="Describe your recipe and preparation method..."
+                  maxLength={5000}
                   disabled={!uploadAllowed}
                 />
+                {validationErrors.recipe && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.recipe}</p>
+                )}
               </div>
 
               <div>
@@ -525,10 +560,25 @@ export default function UploadPage() {
                 <textarea
                   value={editData.ingredients}
                   onChange={(e) => setEditData({ ...editData, ingredients: e.target.value })}
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  rows={3}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+                    validationErrors.ingredients ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Ground beef, tomatoes, onions, chili powder..."
                   disabled={!uploadAllowed}
                 />
+                {validationErrors.ingredients && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.ingredients}</p>
+                )}
+                {editData.ingredients && (
+                  <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Preview:</p>
+                    <IngredientsList
+                      ingredients={parseIngredientsList(editData.ingredients)}
+                      className="text-sm"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -539,9 +589,15 @@ export default function UploadPage() {
                   type="text"
                   value={editData.allergens}
                   onChange={(e) => setEditData({ ...editData, allergens: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+                    validationErrors.allergens ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Dairy, nuts, soy..."
                   disabled={!uploadAllowed}
                 />
+                {validationErrors.allergens && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.allergens}</p>
+                )}
               </div>
 
               <div>
@@ -570,29 +626,42 @@ export default function UploadPage() {
                   value={editData.description}
                   onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+                    validationErrors.description ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Brief description of your chili..."
                   disabled={!uploadAllowed}
                 />
+                {validationErrors.description && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.description}</p>
+                )}
               </div>
             </div>
           ) : (
             <dl className="space-y-3 text-sm">
               {entry?.recipe && (
                 <div>
-                  <dt className="font-semibold text-gray-700">Recipe:</dt>
-                  <dd className="text-gray-600 mt-1">{entry.recipe}</dd>
+                  <dt className="font-semibold text-gray-700 mb-2">Recipe:</dt>
+                  <dd
+                    className="text-gray-600 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: entry.recipe }}
+                  />
                 </div>
               )}
               {entry?.ingredients && entry.ingredients.length > 0 && (
                 <div>
-                  <dt className="font-semibold text-gray-700">Ingredients:</dt>
-                  <dd className="text-gray-600 mt-1">{entry.ingredients.join(', ')}</dd>
+                  <dt className="font-semibold text-gray-700 mb-2">Ingredients:</dt>
+                  <dd className="text-gray-600">
+                    <IngredientsList ingredients={entry.ingredients} />
+                  </dd>
                 </div>
               )}
               {entry?.allergens && entry.allergens.length > 0 && (
                 <div>
-                  <dt className="font-semibold text-gray-700">Allergens:</dt>
-                  <dd className="text-gray-600 mt-1">{entry.allergens.join(', ')}</dd>
+                  <dt className="font-semibold text-gray-700 mb-2">Allergens:</dt>
+                  <dd className="text-gray-600">
+                    <IngredientsList ingredients={entry.allergens} className="text-red-600" />
+                  </dd>
                 </div>
               )}
               <div>

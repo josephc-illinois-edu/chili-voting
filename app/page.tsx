@@ -5,6 +5,7 @@ import { ChiliDatabase } from '@/lib/supabase';
 import { SessionManager } from '@/lib/session';
 import type { ChiliEntry, VoteSubmission } from '@/types/database';
 import { Flame, Star, ChevronRight } from 'lucide-react';
+import IngredientsList from '@/components/IngredientsList';
 
 export default function Home() {
   const [chilis, setChilis] = useState<ChiliEntry[]>([]);
@@ -188,6 +189,43 @@ export default function Home() {
                       className="w-full h-full object-cover"
                     />
                   </div>
+                </div>
+              )}
+
+              {/* Recipe Section */}
+              {selectedChili.recipe && (
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Recipe / Preparation Method</h3>
+                  <div
+                    className="text-sm text-gray-600 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: selectedChili.recipe }}
+                  />
+                </div>
+              )}
+
+              {/* Ingredients Section */}
+              {selectedChili.ingredients && selectedChili.ingredients.length > 0 && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Ingredients</h3>
+                  <IngredientsList
+                    ingredients={selectedChili.ingredients}
+                    className="text-sm"
+                  />
+                </div>
+              )}
+
+              {/* Allergens Section */}
+              {selectedChili.allergens && selectedChili.allergens.length > 0 && (
+                <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                  <h3 className="text-sm font-semibold text-red-700 mb-2 flex items-center gap-2">
+                    <span aria-label="Warning">⚠️</span>
+                    Allergens
+                  </h3>
+                  <IngredientsList
+                    ingredients={selectedChili.allergens}
+                    className="text-sm"
+                    itemClassName="text-red-700 font-medium"
+                  />
                 </div>
               )}
             </div>

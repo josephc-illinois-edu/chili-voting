@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isValidEntryCode } from '@/lib/entry-codes';
+import { validateOrThrow, entryUpdateSchema, ValidationError } from '@/lib/validation';
+import { sanitizeRecipeHtml, sanitizeToPlainText } from '@/lib/sanitization';
+import { normalizeTitle, normalizeSentence, parseIngredientsList } from '@/lib/text-utils';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -40,15 +43,25 @@ function isBeforeDeadline(): boolean {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { entryCode, ...updates } = body;
 
-    // Validate entry code
-    if (!entryCode || !isValidEntryCode(entryCode)) {
-      return NextResponse.json(
-        { error: 'Invalid entry code format' },
-        { status: 400 }
-      );
+    // Validate input with Zod
+    let validatedData;
+    try {
+      validatedData = validateOrThrow(entryUpdateSchema, body);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        return NextResponse.json(
+          {
+            error: 'Validation failed',
+            details: error.errors,
+          },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { entryCode, ...updates } = validatedData;
 
     // Check deadline
     if (!isBeforeDeadline()) {
@@ -72,48 +85,47 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Prepare update data
+    // Prepare and sanitize update data
     const updateData: Record<string, unknown> = {};
 
+    // Sanitize and normalize name
     if (updates.name !== undefined) {
-      updateData.name = updates.name.trim();
+      const sanitized = sanitizeToPlainText(updates.name);
+      updateData.name = normalizeTitle(sanitized);
     }
 
-    if (updates.recipe !== undefined) {
-      updateData.recipe = updates.recipe.trim() || null;
+    // Sanitize recipe HTML
+    if (updates.recipe !== undefined && updates.recipe) {
+      updateData.recipe = sanitizeRecipeHtml(updates.recipe);
+    } else if (updates.recipe === '') {
+      updateData.recipe = null;
     }
 
+    // Parse and sanitize ingredients
     if (updates.ingredients !== undefined) {
-      // Convert comma-separated string to array
       updateData.ingredients = updates.ingredients
-        ? updates.ingredients.split(',').map((item: string) => item.trim()).filter(Boolean)
+        ? parseIngredientsList(updates.ingredients)
         : [];
     }
 
+    // Parse and sanitize allergens
     if (updates.allergens !== undefined) {
-      // Convert comma-separated string to array
       updateData.allergens = updates.allergens
-        ? updates.allergens.split(',').map((item: string) => item.trim()).filter(Boolean)
+        ? parseIngredientsList(updates.allergens)
         : [];
     }
 
+    // Spice level (already validated by Zod)
     if (updates.spiceLevel !== undefined) {
-      const level = parseInt(updates.spiceLevel);
-      if (level >= 1 && level <= 5) {
-        updateData.spice_level = level;
-      }
+      updateData.spice_level = updates.spiceLevel;
     }
 
-    if (updates.description !== undefined) {
-      updateData.description = updates.description.trim() || null;
-    }
-
-    // Validate required fields
-    if (updateData.name !== undefined && !updateData.name) {
-      return NextResponse.json(
-        { error: 'Chili name is required' },
-        { status: 400 }
-      );
+    // Sanitize and normalize description
+    if (updates.description !== undefined && updates.description) {
+      const sanitized = sanitizeToPlainText(updates.description);
+      updateData.description = normalizeSentence(sanitized);
+    } else if (updates.description === '') {
+      updateData.description = null;
     }
 
     // Update entry
@@ -151,6 +163,18 @@ export async function PATCH(request: NextRequest) {
 
   } catch (error) {
     console.error('Unexpected error:', error);
+
+    // Handle validation errors
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: error.errors,
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Internal server error', details: String(error) },
       { status: 500 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase, ChiliDatabase } from '@/lib/supabase';
 import type { ChiliEntry } from '@/types/database';
 import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff, X, Image as ImageIcon } from 'lucide-react';
+import { IngredientsInline } from '@/components/IngredientsList';
 
 interface CategoryWinner {
   chiliId: string;
@@ -312,6 +313,43 @@ export default function ResultsPage() {
 
                     {chili.description && (
                       <p className="text-sm text-gray-600 mb-3">{chili.description}</p>
+                    )}
+
+                    {/* Recipe Section */}
+                    {chili.recipe && (
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <h3 className="text-xs font-semibold text-gray-700 mb-1">Recipe / Preparation Method</h3>
+                        <div
+                          className="text-xs text-gray-600 prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: chili.recipe }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Ingredients Inline */}
+                    {chili.ingredients && chili.ingredients.length > 0 && (
+                      <div className="mb-3">
+                        <span className="text-xs font-semibold text-gray-700">Ingredients: </span>
+                        <IngredientsInline
+                          ingredients={chili.ingredients}
+                          className="text-xs"
+                          maxLength={150}
+                        />
+                      </div>
+                    )}
+
+                    {/* Allergens */}
+                    {chili.allergens && chili.allergens.length > 0 && (
+                      <div className="mb-3 flex items-start gap-2">
+                        <span className="text-xs font-semibold text-red-700 flex items-center gap-1">
+                          <span aria-label="Warning">⚠️</span>
+                          Allergens:
+                        </span>
+                        <IngredientsInline
+                          ingredients={chili.allergens}
+                          className="text-xs text-red-700 font-medium"
+                        />
+                      </div>
                     )}
 
                     {/* Spice Level */}

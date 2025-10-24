@@ -258,6 +258,36 @@ export class ChiliDatabase {
   }
 
   /**
+   * Update an existing chili entry (admin only)
+   * @param id Entry ID to update
+   * @param updates Partial entry data to update
+   * @throws Error if update fails
+   */
+  static async updateChiliEntry(id: string, updates: Partial<ChiliEntry>): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('chili_entries')
+        .update({
+          ...(updates.name !== undefined && { name: updates.name }),
+          ...(updates.contestant_name !== undefined && { contestant_name: updates.contestant_name }),
+          ...(updates.recipe !== undefined && { recipe: updates.recipe }),
+          ...(updates.ingredients !== undefined && { ingredients: updates.ingredients }),
+          ...(updates.allergens !== undefined && { allergens: updates.allergens }),
+          ...(updates.spice_level !== undefined && { spice_level: updates.spice_level }),
+          ...(updates.description !== undefined && { description: updates.description }),
+        })
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error updating chili entry:', error);
+      throw new Error('Failed to update chili entry');
+    }
+  }
+
+  /**
    * Check if a session has voted for a specific chili
    * @param sessionId Session identifier
    * @param chiliId Chili entry identifier
