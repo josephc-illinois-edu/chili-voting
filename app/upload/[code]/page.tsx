@@ -643,7 +643,7 @@ export default function UploadPage() {
                 <div>
                   <dt className="font-semibold text-gray-700 mb-2">Recipe:</dt>
                   <dd
-                    className="text-gray-600 prose prose-sm max-w-none"
+                    className="text-gray-600 prose prose-sm max-w-none whitespace-pre-line"
                     dangerouslySetInnerHTML={{ __html: entry.recipe }}
                   />
                 </div>
