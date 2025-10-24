@@ -33,6 +33,7 @@ export default function RichTextEditor({
   className = '',
 }: RichTextEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false, // Fix SSR hydration issues in Next.js
     extensions: [
       StarterKit.configure({
         heading: {
