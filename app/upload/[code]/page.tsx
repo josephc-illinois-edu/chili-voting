@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Camera, Upload, AlertCircle, CheckCircle, Clock, Edit2, Save, X } from 'lucide-react';
+import { Camera, Upload, AlertCircle, CheckCircle, Clock, Edit2, Save, X, Flame } from 'lucide-react';
 import RichTextEditor from '@/components/RichTextEditor';
 import IngredientsList from '@/components/IngredientsList';
 import { parseIngredientsList } from '@/lib/text-utils';
@@ -288,7 +288,7 @@ export default function UploadPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your entry...</p>
@@ -299,7 +299,7 @@ export default function UploadPage() {
 
   if (error && !entry) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-md p-6 max-w-md w-full text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-800 mb-2">Entry Not Found</h2>
@@ -316,10 +316,10 @@ export default function UploadPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 py-6 px-4">
+    <main className="min-h-screen bg-gray-50 py-6 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-800">{entry?.name}</h1>
@@ -417,7 +417,7 @@ export default function UploadPage() {
                   <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    className="flex-1 bg-green-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-700 disabled:bg-gray-300 transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700 disabled:bg-gray-300 transition-colors flex items-center justify-center gap-2 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   >
                     {uploading ? (
                       <>
@@ -502,14 +502,14 @@ export default function UploadPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleSaveEdit}
-                  className="flex items-center gap-2 text-sm bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold"
+                  className="flex items-center gap-2 text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
                 >
                   <Save size={16} />
                   Save
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="text-sm text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100"
+                  className="text-sm text-gray-700 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
@@ -613,9 +613,12 @@ export default function UploadPage() {
                   className="w-full"
                   disabled={!uploadAllowed}
                 />
-                <p className="text-center text-sm text-gray-600 mt-1">
-                  {'🔥'.repeat(editData.spiceLevel)} ({editData.spiceLevel}/5)
-                </p>
+                <div className="text-center text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
+                  {Array.from({ length: editData.spiceLevel }).map((_, i) => (
+                    <Flame key={i} size={16} className="text-red-600" fill="currentColor" />
+                  ))}
+                  <span className="ml-1">({editData.spiceLevel}/5)</span>
+                </div>
               </div>
 
               <div>
@@ -666,8 +669,11 @@ export default function UploadPage() {
               )}
               <div>
                 <dt className="font-semibold text-gray-700">Spice Level:</dt>
-                <dd className="text-gray-600 mt-1">
-                  {'🔥'.repeat(entry?.spiceLevel || 0)} ({entry?.spiceLevel}/5)
+                <dd className="text-gray-600 mt-1 flex items-center gap-1">
+                  {Array.from({ length: entry?.spiceLevel || 0 }).map((_, i) => (
+                    <Flame key={i} size={16} className="text-red-600" fill="currentColor" />
+                  ))}
+                  <span className="ml-1">({entry?.spiceLevel}/5)</span>
                 </dd>
               </div>
               {entry?.description && (

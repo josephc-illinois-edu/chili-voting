@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ChiliDatabase } from '@/lib/supabase';
 import { SessionManager } from '@/lib/session';
 import type { ChiliEntry, VoteSubmission } from '@/types/database';
-import { Flame, Star, ChevronRight } from 'lucide-react';
+import { Flame, Star, ChevronRight, Trophy, Lock } from 'lucide-react';
 import IngredientsList from '@/components/IngredientsList';
 
 export default function Home() {
@@ -140,9 +140,9 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <Flame className="w-16 h-16 text-red-500 animate-bounce mx-auto mb-4" aria-hidden="true" />
+          <Flame className="w-16 h-16 text-red-600 animate-bounce mx-auto mb-4" aria-hidden="true" />
           <p className="text-xl text-gray-600">Loading chili entries...</p>
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function Home() {
 
   if (selectedChili) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-2xl mx-auto">
           <main>
             <div className="bg-white rounded-lg shadow-lg p-6">
@@ -305,7 +305,7 @@ export default function Home() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setSelectedChili(null)}
-                  className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="flex-1 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                   aria-label="Cancel voting and return to chili list"
                 >
                   Cancel
@@ -313,7 +313,7 @@ export default function Home() {
                 <button
                   onClick={submitVote}
                   disabled={voting}
-                  className="flex-1 px-6 py-3 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 disabled:bg-gray-300 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:bg-gray-300 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   aria-label="Submit your vote for this chili"
                   aria-busy={voting}
                 >
@@ -329,16 +329,16 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <main>
           {/* Hero Section */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
             <div className="text-center">
               <div className="flex items-center justify-center mb-4">
-                <Flame className="w-20 h-20 text-red-500" aria-hidden="true" />
+                <Flame className="w-12 h-12 text-red-600" aria-hidden="true" />
               </div>
-              <h1 className="text-5xl font-bold text-gray-800 mb-3">
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
                 {process.env.NEXT_PUBLIC_EVENT_NAME || 'Chili Cook-Off 2025'}
               </h1>
             <p className="text-xl text-gray-600 mb-2">
@@ -349,46 +349,50 @@ export default function Home() {
             </p>
 
             {/* Instructions */}
-            <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-red-800 mb-3">How to Vote</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
+              <h2 className="text-xl font-bold text-gray-900 mb-3">How to Vote</h2>
               <ol className="text-left text-gray-700 space-y-2">
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold">1</span>
                   <span><strong>Browse</strong> the chili entries below and find one you&apos;d like to vote for</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold">2</span>
                   <span><strong>Click &quot;Vote Now&quot;</strong> on any chili that interests you</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold">3</span>
                   <span><strong>Rate</strong> the chili in 5 categories using the star system</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</span>
+                  <span className="flex-shrink-0 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold">4</span>
                   <span><strong>Submit</strong> your vote and check out the live results!</span>
                 </li>
               </ol>
-              <p className="mt-4 text-sm text-gray-600">
-                💡 <strong>Tip:</strong> You can vote for multiple chilis, but only once per chili!
-              </p>
+              <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                <p className="text-sm text-blue-900">
+                  <strong>Tip:</strong> You can vote for multiple chilis, but only once per chili!
+                </p>
+              </div>
             </div>
 
             <nav aria-label="Main navigation">
               <div className="flex flex-wrap justify-center gap-4">
                 <a
                   href="/results"
-                  className="px-8 py-3 bg-red-500 text-white rounded-md shadow hover:shadow-lg hover:bg-red-600 transition-all font-bold text-lg focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   aria-label="View live voting results and leaderboard"
                 >
-                  <span aria-hidden="true">🏆</span> View Live Results
+                  <Trophy size={20} aria-hidden="true" />
+                  View Live Results
                 </a>
                 <a
                   href="/admin"
-                  className="px-8 py-3 bg-gray-700 text-white rounded-md shadow hover:shadow-lg hover:bg-gray-800 transition-all font-bold text-lg focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                   aria-label="Access admin panel to manage entries"
                 >
-                  <span aria-hidden="true">🔐</span> Admin Panel
+                  <Lock size={20} aria-hidden="true" />
+                  Admin Panel
                 </a>
               </div>
             </nav>
@@ -416,8 +420,8 @@ export default function Home() {
               return (
                 <div
                   key={chili.id}
-                  className={`bg-white rounded-lg shadow-md overflow-hidden transition-all ${
-                    hasVoted ? 'opacity-60' : 'hover:shadow-lg'
+                  className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all ${
+                    hasVoted ? '' : 'hover:shadow-md hover:border-gray-300'
                   }`}
                 >
                   {/* Photo Display */}
@@ -469,10 +473,10 @@ export default function Home() {
                     <button
                       onClick={() => handleVoteClick(chili)}
                       disabled={hasVoted}
-                      className={`w-full py-2 rounded-md font-semibold flex items-center justify-center gap-2 transition-colors focus:ring-2 focus:ring-offset-2 ${
+                      className={`w-full py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors focus:ring-2 focus:ring-offset-2 ${
                         hasVoted
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed focus:ring-gray-400'
-                          : 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500'
+                          ? 'bg-gray-100 text-gray-600 border border-gray-300 cursor-not-allowed focus:ring-gray-400'
+                          : 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
                       }`}
                       aria-label={hasVoted ? `Already voted for ${chili.name}` : `Vote for ${chili.name} by ${chili.contestant_name}`}
                       aria-disabled={hasVoted}

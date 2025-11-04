@@ -168,7 +168,7 @@ interface IngredientsCountProps {
 export function IngredientsCount({ count, className = '' }: IngredientsCountProps) {
   return (
     <span
-      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ${className}`}
+      className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 ${className}`}
     >
       {count} {count === 1 ? 'ingredient' : 'ingredients'}
     </span>

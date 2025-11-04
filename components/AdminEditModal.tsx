@@ -212,9 +212,12 @@ export default function AdminEditModal({ entry, isOpen, onClose, onSave }: Admin
                   onChange={(e) => setEditData({ ...editData, spiceLevel: parseInt(e.target.value) })}
                   className="flex-1"
                 />
-                <span className="text-2xl">
-                  {'🔥'.repeat(editData.spiceLevel)} ({editData.spiceLevel}/5)
-                </span>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: editData.spiceLevel }).map((_, i) => (
+                    <span key={i} className="text-red-600">🔥</span>
+                  ))}
+                  <span className="ml-2 text-lg">({editData.spiceLevel}/5)</span>
+                </div>
               </div>
             </div>
 
@@ -303,7 +306,7 @@ export default function AdminEditModal({ entry, isOpen, onClose, onSave }: Admin
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
             disabled={saving}
