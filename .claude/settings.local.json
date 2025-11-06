@@ -24,7 +24,10 @@
       "Bash(cat:*)",
       "Read(//c/Users/josephc/Desktop/**)",
       "mcp__design-guide__design_review",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)"
     ],
     "deny": [],
     "ask": []
