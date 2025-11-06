@@ -7,6 +7,8 @@ export interface ChiliEntry {
   id: string;
   name: string;
   contestant_name: string;
+  contestant_email?: string | null;
+  chili_type?: string | null;
   recipe: string;
   ingredients: string[];
   allergens: string[];
@@ -56,6 +58,8 @@ export interface VoteSubmission {
 export interface ChiliSubmission {
   name: string;
   contestantName: string;
+  contestantEmail?: string;
+  chiliType?: string;
   recipe: string;
   ingredients: string;
   allergens: string;

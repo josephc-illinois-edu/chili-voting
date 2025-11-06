@@ -24,6 +24,16 @@
 .DS_Store
 *.pem
 
+# Word and Office temporary files
+~$*.doc*
+~$*.xls*
+~$*.ppt*
+*.tmp
+
+# Generated documentation
+*.docx
+*.pdf
+
 # debug
 npm-debug.log*
 yarn-debug.log*

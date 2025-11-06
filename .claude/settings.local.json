@@ -27,7 +27,12 @@
       "Bash(rm:*)",
       "Bash(git merge:*)",
       "Bash(git stash:*)",
-      "Bash(git stash pop:*)"
+      "Bash(git stash pop:*)",
+      "WebFetch(domain:docs.google.com)",
+      "Bash(npx xlsx:*)",
+      "Bash(npx xlsx-cli:*)",
+      "Bash(pandoc:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []

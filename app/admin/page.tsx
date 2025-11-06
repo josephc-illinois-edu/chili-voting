@@ -5,7 +5,7 @@ import { ChiliDatabase } from '@/lib/supabase';
 import { QRCodeGenerator } from '@/lib/qr-generator';
 import { AdminAuth } from '@/lib/admin-auth';
 import type { ChiliEntry } from '@/types/database';
-import { Plus, ArrowLeft, Printer, Lock, LogOut, Edit2, Trash2, Camera } from 'lucide-react';
+import { Plus, ArrowLeft, Printer, Lock, LogOut, Edit2, Trash2, Camera, RefreshCw } from 'lucide-react';
 import AdminEditModal from '@/components/AdminEditModal';
 
 export default function AdminPage() {
@@ -27,6 +27,8 @@ export default function AdminPage() {
   });
   const [editingEntry, setEditingEntry] = useState<ChiliEntry | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{message: string; type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
     // Check if already authenticated
@@ -74,6 +76,47 @@ export default function AdminPage() {
       });
     } catch (error) {
       console.error('Error loading chilis:', error);
+    }
+  };
+
+  const handleSyncGoogleSheets = async () => {
+    if (!confirm('Sync chili entries from Google Sheets? This will import new entries that don\'t already exist.')) {
+      return;
+    }
+
+    setSyncing(true);
+    setSyncStatus(null);
+
+    try {
+      const response = await fetch('/api/sync-google-sheets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': process.env.NEXT_PUBLIC_ADMIN_SECRET_KEY || '',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sync');
+      }
+
+      setSyncStatus({
+        message: data.message,
+        type: 'success',
+      });
+
+      // Reload chilis after sync
+      await loadChilis();
+    } catch (error) {
+      console.error('Error syncing Google Sheets:', error);
+      setSyncStatus({
+        message: error instanceof Error ? error.message : 'Failed to sync from Google Sheets',
+        type: 'error',
+      });
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -313,7 +356,7 @@ export default function AdminPage() {
         {/* Primary Actions */}
         <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8" aria-labelledby="quick-actions-heading">
           <h2 id="quick-actions-heading" className="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <button
               onClick={() => setShowAddForm(!showAddForm)}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -345,8 +388,27 @@ export default function AdminPage() {
               <Trash2 size={20} aria-hidden="true" />
               <span>Delete Test Entries ({stats.testEntries})</span>
             </button>
+
+            <button
+              onClick={handleSyncGoogleSheets}
+              disabled={syncing || loading}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-semibold focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Sync chili entries from Google Sheets"
+              aria-busy={syncing}
+            >
+              <RefreshCw size={20} aria-hidden="true" className={syncing ? 'animate-spin' : ''} />
+              <span>{syncing ? 'Syncing...' : 'Sync Google Sheets'}</span>
+            </button>
           </div>
         </section>
+
+        {syncStatus && (
+          <div className={`p-4 rounded-lg mb-8 ${
+            syncStatus.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+            {syncStatus.message}
+          </div>
+        )}
 
         {/* Add Chili Form */}
         {showAddForm && (

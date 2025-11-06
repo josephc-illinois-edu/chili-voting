@@ -1,77 +1,221 @@
 # Chili Cook-Off Voting System
 
-A TypeScript-based Single Page Application with anonymous voting, QR code integration, and real-time results using Supabase and Next.js.
+A modern TypeScript voting application with anonymous voting, Google Sheets integration, contestant self-service, photo uploads, QR codes, and real-time results.
 
-## Quick Start
+## ✨ Features
 
-### 1. Configure Environment Variables
+### Voting
+- **Anonymous Voting**: Session-based tracking with device fingerprinting
+- **Ballot Stuffing Prevention**: Multiple layers of duplicate vote detection
+- **Category Ratings**: Vote on taste, presentation, creativity, and spice balance
+- **Mobile-First Design**: Responsive interface optimized for smartphones
+- **Progressive Web App**: Installable on mobile devices with offline capability
 
-Edit `.env.local` and add your Supabase credentials:
+### Contestant Features
+- **Self-Service Portal**: Contestants can manage their own entries via unique codes
+- **Photo Uploads**: Upload and update chili presentation photos
+- **Entry Editing**: Update descriptions, ingredients, allergens, and more
+- **QR Code Access**: Scan personal QR codes to access entry management
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
+### Admin Features
+- **Google Sheets Sync**: Import entries directly from Google Forms responses
+- **Entry Management**: Create, edit, and delete chili entries
+- **QR Code Generation**: Generate printable QR codes for each entry
+- **Results Dashboard**: Real-time voting statistics and leaderboards
 
-Get these from your Supabase project Settings → API.
+### Integration & Performance
+- **Google Forms Integration**: Seamlessly sync contestant submissions
+- **Supabase Backend**: PostgreSQL database with real-time updates
+- **Rich Text Support**: TipTap editor for recipes and descriptions
+- **Service Worker Caching**: Faster loading with intelligent cache strategies
+- **Offline Support**: Graceful degradation when connection is lost
 
-### 2. Install Dependencies
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Supabase account
+- (Optional) Google Cloud account for Forms integration
+
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Run Development Server
+### 2. Configure Environment Variables
+
+Create `.env.local` with the following:
+
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Admin Authentication
+ADMIN_SECRET_KEY=your-secure-admin-password
+NEXT_PUBLIC_ADMIN_SECRET_KEY=your-secure-admin-password
+
+# Event Configuration
+NEXT_PUBLIC_EVENT_NAME="Chili Cook-Off 2025"
+NEXT_PUBLIC_EVENT_DATE="November 19, 2025"
+NEXT_PUBLIC_EVENT_TIME="11:00 AM – 1:30 PM"
+NEXT_PUBLIC_UPLOAD_DEADLINE="2025-11-19T11:00:00"
+
+# Google Sheets Integration (Optional)
+GOOGLE_SHEETS_ID=your-spreadsheet-id
+GOOGLE_SHEETS_CREDENTIALS='{"type":"service_account",...}'
+# OR
+GOOGLE_SERVICE_ACCOUNT_EMAIL=your-sa@project.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+### 3. Set Up Database
+
+1. Create a new Supabase project
+2. Run the migration SQL from `migrations/add-contestant-fields.sql`
+3. Enable Storage and create a `chili-photos` bucket
+4. Configure Storage policies for public read access
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+Open [http://localhost:3000](http://localhost:3000)
 
-## Features
+## 📱 Application Pages
 
-- **Anonymous Voting**: No login required, session-based tracking
-- **Real-time Results**: Live leaderboard with auto-refresh
-- **QR Code Generation**: Printable QR codes for each chili entry
-- **Mobile-Friendly**: Responsive design optimized for phones
-- **Category Ratings**: Vote on taste, presentation, creativity, and spice balance
+| Route | Description |
+|-------|-------------|
+| `/` | Main voting interface with chili entries |
+| `/results` | Live leaderboard and voting statistics |
+| `/vote` | Dedicated voting page |
+| `/admin` | Admin panel (requires secret key) |
+| `/upload` | Contestant entry code portal |
+| `/upload/[code]` | Contestant self-service entry management |
 
-## Pages
+## 🛠️ Tech Stack
 
-- `/` - Main voting interface
-- `/results` - Live leaderboard
-- `/admin` - Admin panel for managing entries and generating QR codes
+- **Framework**: Next.js 14.2 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Storage**: Supabase Storage
+- **Authentication**: Session-based + Device Fingerprinting
+- **Rich Text**: TipTap Editor
+- **QR Codes**: qrcode.js
+- **Icons**: Native emoji (no dependencies!)
+- **Forms**: Google Forms + Google Sheets API
+- **Validation**: Zod
 
-## Tech Stack
+## 📚 Documentation
 
-- Next.js 15 with App Router
-- TypeScript
-- Tailwind CSS
-- Supabase (PostgreSQL + Real-time)
-- Lucide React Icons
-- QRCode.js
+### Setup Guides
+- **[Google Sheets Setup](./docs/setup/GOOGLE_SHEETS_SETUP.md)** - Complete guide for Google Forms integration
+- **[Deployment](./docs/setup/DEPLOYMENT.md)** - Deployment instructions for various platforms
 
-## Deployment
+### User Guides
+- **[Contestant Guide](./docs/guides/CONTESTANT_GUIDE.md)** - Instructions for contestants using self-service
 
-Deploy to Vercel:
+### Technical Documentation
+- **[Testing Guide](./docs/technical/TESTING_GUIDE.md)** - Testing procedures and scenarios
+- **[Ballot Stuffing Prevention](./docs/technical/BALLOT_STUFFING_PREVENTION.md)** - Security measures
+
+## 🎯 Pre-Event Checklist
+
+- [ ] Configure all environment variables
+- [ ] Run database migrations
+- [ ] Set up Supabase Storage bucket
+- [ ] Import entries from Google Forms (if using)
+- [ ] Test voting flow on multiple devices
+- [ ] Test PWA "Add to Home Screen" on production
+- [ ] Generate and print QR codes for all entries
+- [ ] Test contestant self-service portal
+- [ ] Set up results display (projector/TV)
+- [ ] Verify upload deadline is configured correctly
+- [ ] Brief volunteers on entry codes
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
 
 1. Push to GitHub
 2. Import repository to Vercel
-3. Add environment variables
+3. Add all environment variables
 4. Deploy
 
-## Database Schema
+### Other Platforms
 
-See the documentation for the complete database setup script.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
-## Event Day Checklist
+## 🔒 Security Features
 
-- [ ] Test voting flow
-- [ ] Generate and print QR codes
-- [ ] Set up results display
-- [ ] Brief volunteers
+- Session-based anonymous voting
+- Device fingerprinting
+- Rate limiting
+- Duplicate vote detection
+- Admin secret key authentication
+- Entry code authentication for contestants
+- RLS policies on database
+- XSS protection with input sanitization
+- Deadline enforcement for uploads/edits
 
-## License
+## 🤝 Contestant Workflow
+
+1. Submit Google Form with chili details
+2. Admin syncs Google Sheets to import entries
+3. System generates unique 6-character entry code
+4. Contestant receives QR code (printed or emailed)
+5. Contestant scans QR code or enters code at `/upload`
+6. Upload photo and edit entry details
+7. View live voting results during event
+
+## 🎨 Recent Updates
+
+- **PWA Implementation**: Added service worker for offline capability and "Add to Home Screen"
+- Replaced icon library with native emoji (smaller bundle size!)
+- Added Google Sheets integration for form imports
+- Implemented contestant self-service portal
+- Added photo upload capability
+- Created rich text editor for recipes
+- Enhanced mobile web app capabilities
+- Added comprehensive contestant documentation
+
+## 📊 Database Schema
+
+### Tables
+- `chili_entries` - Chili entries with metadata
+- `votes` - Individual vote records with categories
+
+### Key Fields
+- `entry_code` - Unique 6-character code for contestant access
+- `contestant_email` - For communication and notifications
+- `chili_type` - Classification (traditional, vegetarian, etc.)
+- `photo_url` - Link to uploaded presentation photo
+
+## 🐛 Troubleshooting
+
+**Build Errors**: Clear `.next` folder and rebuild
+```bash
+rm -rf .next && npm run build
+```
+
+**Environment Variables**: Restart dev server after changes
+```bash
+# Kill existing process, then
+npm run dev
+```
+
+**Database Issues**: Check Supabase connection and RLS policies
+
+**Google Sheets Sync Fails**: Verify service account permissions and credentials
+
+## 📝 License
 
 MIT License - Use freely for your events!
+
+## 🙏 Credits
+
+Built with Next.js, Supabase, and lots of chili.

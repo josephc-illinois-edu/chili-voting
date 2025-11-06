@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { ChiliDatabase } from '@/lib/supabase';
 import { SessionManager } from '@/lib/session';
 import type { ChiliEntry, VoteSubmission } from '@/types/database';
-import { Flame, Star, ChevronRight, Trophy, Lock } from 'lucide-react';
 import IngredientsList from '@/components/IngredientsList';
 
 export default function Home() {
@@ -124,13 +123,13 @@ export default function Home() {
             aria-pressed={star === value}
             className="focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded transition-all"
           >
-            <Star
-              size={32}
-              fill={star <= value ? '#fbbf24' : 'none'}
-              stroke={star <= value ? '#fbbf24' : '#d1d5db'}
-              className="cursor-pointer transition-colors"
+            <span
+              className="cursor-pointer transition-opacity text-3xl"
+              style={{ opacity: star <= value ? 1 : 0.3 }}
               aria-hidden="true"
-            />
+            >
+              ⭐
+            </span>
           </button>
         ))}
         <span className="sr-only">{value > 0 ? `Current rating: ${value} out of 5 stars` : 'No rating selected'}</span>
@@ -142,7 +141,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <Flame className="w-16 h-16 text-red-600 animate-bounce mx-auto mb-4" aria-hidden="true" />
+          <span className="text-6xl animate-bounce inline-block mb-4" aria-hidden="true">🔥</span>
           <p className="text-xl text-gray-600">Loading chili entries...</p>
         </div>
       </div>
@@ -167,13 +166,13 @@ export default function Home() {
                 <span className="text-sm font-semibold text-gray-700">Spice Level:</span>
                 <div className="flex gap-1" role="img" aria-label={`${selectedChili.spice_level} out of 5 spice level`}>
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Flame
+                    <span
                       key={i}
-                      size={16}
-                      fill={i < selectedChili.spice_level ? '#ef4444' : 'none'}
-                      stroke={i < selectedChili.spice_level ? '#ef4444' : '#d1d5db'}
+                      style={{ opacity: i < selectedChili.spice_level ? 1 : 0.3 }}
                       aria-hidden="true"
-                    />
+                    >
+                      🔥
+                    </span>
                   ))}
                 </div>
               </div>
@@ -336,7 +335,7 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
             <div className="text-center">
               <div className="flex items-center justify-center mb-4">
-                <Flame className="w-12 h-12 text-red-600" aria-hidden="true" />
+                <span className="text-5xl" aria-hidden="true">🔥</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
                 {process.env.NEXT_PUBLIC_EVENT_NAME || 'Chili Cook-Off 2025'}
@@ -383,7 +382,7 @@ export default function Home() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   aria-label="View live voting results and leaderboard"
                 >
-                  <Trophy size={20} aria-hidden="true" />
+                  <span className="text-xl" aria-hidden="true">🏆</span>
                   View Live Results
                 </a>
                 <a
@@ -391,7 +390,7 @@ export default function Home() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                   aria-label="Access admin panel to manage entries"
                 >
-                  <Lock size={20} aria-hidden="true" />
+                  <span className="text-xl" aria-hidden="true">🔒</span>
                   Admin Panel
                 </a>
               </div>
@@ -448,13 +447,14 @@ export default function Home() {
                     <span className="text-xs font-semibold text-gray-600">Spice:</span>
                     <div className="flex gap-0.5" role="img" aria-label={`${chili.spice_level} out of 5 spice level`}>
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <Flame
+                        <span
                           key={i}
-                          size={14}
-                          fill={i < chili.spice_level ? '#ef4444' : 'none'}
-                          stroke={i < chili.spice_level ? '#ef4444' : '#d1d5db'}
+                          className="text-sm"
+                          style={{ opacity: i < chili.spice_level ? 1 : 0.3 }}
                           aria-hidden="true"
-                        />
+                        >
+                          🔥
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -463,7 +463,7 @@ export default function Home() {
                     <span>{chili.vote_count} vote{chili.vote_count !== 1 ? 's' : ''}</span>
                     {chili.vote_count > 0 && (
                       <span className="flex items-center gap-1">
-                        <Star size={14} fill="#fbbf24" stroke="#fbbf24" aria-hidden="true" />
+                        <span className="text-sm" aria-hidden="true">⭐</span>
                         <span className="sr-only">Average rating: </span>
                         {chili.average_rating.toFixed(1)}
                       </span>
@@ -482,7 +482,7 @@ export default function Home() {
                       aria-disabled={hasVoted}
                     >
                       {hasVoted ? 'Already Voted' : 'Vote Now'}
-                      {!hasVoted && <ChevronRight size={18} aria-hidden="true" />}
+                      {!hasVoted && <span aria-hidden="true">➡️</span>}
                     </button>
                   </div>
                 </div>
