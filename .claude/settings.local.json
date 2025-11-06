@@ -31,7 +31,8 @@
       "WebFetch(domain:docs.google.com)",
       "Bash(npx xlsx:*)",
       "Bash(npx xlsx-cli:*)",
-      "Bash(pandoc:*)"
+      "Bash(pandoc:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []
