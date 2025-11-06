@@ -5,7 +5,7 @@ import { ChiliDatabase } from '@/lib/supabase';
 import { QRCodeGenerator } from '@/lib/qr-generator';
 import { AdminAuth } from '@/lib/admin-auth';
 import type { ChiliEntry } from '@/types/database';
-import { Plus, ArrowLeft, Printer, Lock, LogOut, Edit2 } from 'lucide-react';
+import { Plus, ArrowLeft, Printer, Lock, LogOut, Edit2, Trash2, Camera } from 'lucide-react';
 import AdminEditModal from '@/components/AdminEditModal';
 
 export default function AdminPage() {
@@ -204,7 +204,7 @@ export default function AdminPage() {
   // Login Form
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
           <div className="flex items-center justify-center mb-6">
             <Lock className="w-12 h-12 text-red-500" />
@@ -263,7 +263,7 @@ export default function AdminPage() {
 
   // Admin Panel (authenticated)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <main>
           {/* Header */}
@@ -292,57 +292,57 @@ export default function AdminPage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" role="region" aria-label="Dashboard statistics">
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
             <p className="text-4xl font-bold text-red-600" aria-label={`${stats.totalEntries} total entries`}>{stats.totalEntries}</p>
             <p className="text-gray-600 font-semibold">Total Entries</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-blue-600" aria-label={`${stats.totalVotes} total votes cast`}>{stats.totalVotes}</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <p className="text-4xl font-bold text-red-600" aria-label={`${stats.totalVotes} total votes cast`}>{stats.totalVotes}</p>
             <p className="text-gray-600 font-semibold">Total Votes Cast</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-green-600" aria-label={`${stats.entriesWithPhotos} entries with photos`}>{stats.entriesWithPhotos}</p>
-            <p className="text-gray-600 font-semibold">📸 With Photos</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <p className="text-4xl font-bold text-red-600" aria-label={`${stats.entriesWithPhotos} entries with photos`}>{stats.entriesWithPhotos}</p>
+            <p className="text-gray-600 font-semibold">With Photos</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-4xl font-bold text-yellow-600" aria-label={`${stats.testEntries} test entries`}>{stats.testEntries}</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <p className="text-4xl font-bold text-red-600" aria-label={`${stats.testEntries} test entries`}>{stats.testEntries}</p>
             <p className="text-gray-600 font-semibold">Test Entries</p>
           </div>
         </div>
 
         {/* Primary Actions */}
-        <section className="bg-white rounded-lg shadow-lg p-6 mb-8" aria-labelledby="quick-actions-heading">
-          <h2 id="quick-actions-heading" className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8" aria-labelledby="quick-actions-heading">
+          <h2 id="quick-actions-heading" className="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               aria-label={showAddForm ? "Close add new chili form" : "Open add new chili form"}
               aria-expanded={showAddForm}
             >
-              <Plus size={24} aria-hidden="true" />
+              <Plus size={20} aria-hidden="true" />
               <span>Add New Chili</span>
             </button>
 
             <button
               onClick={generateAndPrintQRCodes}
               disabled={loading || chilis.length === 0}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 transition-colors font-semibold focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 transition-colors font-semibold focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
               aria-label={`Print QR codes for all ${chilis.length} chili entries`}
               aria-busy={loading}
             >
-              <Printer size={24} aria-hidden="true" />
+              <Printer size={20} aria-hidden="true" />
               <span>{loading ? 'Generating...' : 'Print QR Codes'}</span>
             </button>
 
             <button
               onClick={handleBulkDeleteTestEntries}
               disabled={loading || stats.testEntries === 0}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 transition-colors font-semibold focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               aria-label={`Delete all ${stats.testEntries} test entries`}
               aria-busy={loading}
             >
-              <span aria-hidden="true">🗑️</span>
+              <Trash2 size={20} aria-hidden="true" />
               <span>Delete Test Entries ({stats.testEntries})</span>
             </button>
           </div>
@@ -492,15 +492,16 @@ export default function AdminPage() {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-xl font-bold text-gray-800">{chili.name}</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{chili.name}</h3>
                         {chili.name.startsWith('Test') && (
-                          <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-semibold" role="status">
+                          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md font-medium" role="status">
                             TEST
                           </span>
                         )}
                         {chili.photo_url && (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold" role="status" aria-label="Photo uploaded">
-                            📸 Photo
+                          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md font-medium" role="status" aria-label="Photo uploaded">
+                            <Camera size={12} aria-hidden="true" />
+                            Photo
                           </span>
                         )}
                       </div>
@@ -562,7 +563,7 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleOpenEditModal(chili)}
                         disabled={loading}
-                        className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center gap-2"
                         aria-label={`Edit ${chili.name}`}
                         aria-busy={loading}
                       >
@@ -572,11 +573,12 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleDeleteChili(chili.id, chili.name)}
                         disabled={loading}
-                        className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 transition-colors font-semibold text-sm whitespace-nowrap focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                         aria-label={`Delete ${chili.name} and its ${chili.vote_count} votes`}
                         aria-busy={loading}
                       >
-                        <span aria-hidden="true">🗑️</span> Delete
+                        <Trash2 size={16} aria-hidden="true" />
+                        Delete
                       </button>
                       {chili.vote_count > 0 && (
                         <span className="text-xs text-center text-gray-500 self-center sm:self-auto" aria-hidden="true">

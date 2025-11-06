@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, ChiliDatabase } from '@/lib/supabase';
 import type { ChiliEntry } from '@/types/database';
-import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff, X, Image as ImageIcon } from 'lucide-react';
+import { Trophy, Medal, Star, Flame, ArrowLeft, TrendingUp, Wifi, WifiOff, X, Image as ImageIcon, Award, Palette, Lightbulb } from 'lucide-react';
 import { IngredientsInline } from '@/components/IngredientsList';
 
 interface CategoryWinner {
@@ -101,9 +101,9 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <TrendingUp className="w-16 h-16 text-red-500 animate-pulse mx-auto mb-4" aria-hidden="true" />
+          <TrendingUp className="w-16 h-16 text-red-600 animate-pulse mx-auto mb-4" aria-hidden="true" />
           <p className="text-xl text-gray-600">Loading results...</p>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <main>
           {/* Header */}
@@ -178,17 +178,16 @@ export default function ResultsPage() {
 
         {/* Category Winners */}
         {stats.totalVotes > 0 && (
-          <div className="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg shadow-lg p-6" role="region" aria-label="Category champions" aria-live="polite">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6 flex items-center justify-center gap-2">
-              <Star className="w-7 h-7 text-yellow-500" aria-hidden="true" />
+          <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6" role="region" aria-label="Category champions" aria-live="polite">
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-6 flex items-center justify-center gap-2">
+              <Award className="w-7 h-7 text-red-600" aria-hidden="true" />
               Category Champions
-              <Star className="w-7 h-7 text-yellow-500" aria-hidden="true" />
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Best Taste */}
-              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
-                <div className="text-4xl mb-2" aria-hidden="true">👅</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Taste</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 ring-2 ring-red-600 p-5 text-center">
+                <Award className="w-10 h-10 mx-auto mb-2 text-red-600" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Best Taste</h3>
                 {categoryWinners.taste ? (
                   <>
                     <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.taste.avgScore}</p>
@@ -201,9 +200,9 @@ export default function ResultsPage() {
               </div>
 
               {/* Best Presentation */}
-              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
-                <div className="text-4xl mb-2" aria-hidden="true">🎨</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Presentation</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 ring-2 ring-red-600 p-5 text-center">
+                <Palette className="w-10 h-10 mx-auto mb-2 text-red-600" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Best Presentation</h3>
                 {categoryWinners.presentation ? (
                   <>
                     <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.presentation.avgScore}</p>
@@ -216,9 +215,9 @@ export default function ResultsPage() {
               </div>
 
               {/* Best Creativity */}
-              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
-                <div className="text-4xl mb-2" aria-hidden="true">💡</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Creativity</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 ring-2 ring-red-600 p-5 text-center">
+                <Lightbulb className="w-10 h-10 mx-auto mb-2 text-red-600" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Best Creativity</h3>
                 {categoryWinners.creativity ? (
                   <>
                     <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.creativity.avgScore}</p>
@@ -231,9 +230,9 @@ export default function ResultsPage() {
               </div>
 
               {/* Best Spice Balance */}
-              <div className="bg-white rounded-lg shadow-md p-5 text-center border-2 border-yellow-400">
-                <div className="text-4xl mb-2" aria-hidden="true">🌶️</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Best Spice Balance</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 ring-2 ring-red-600 p-5 text-center">
+                <Flame className="w-10 h-10 mx-auto mb-2 text-red-600" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Best Spice Balance</h3>
                 {categoryWinners.spiceBalance ? (
                   <>
                     <p className="text-xl font-bold text-red-600 mb-1">{categoryWinners.spiceBalance.avgScore}</p>
@@ -266,8 +265,8 @@ export default function ResultsPage() {
             chilis.map((chili, index) => (
               <article
                 key={chili.id}
-                className={`bg-white rounded-lg shadow-md p-6 transition-all ${
-                  index < 3 ? 'ring-2 ring-yellow-400' : ''
+                className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all ${
+                  index < 3 ? 'ring-2 ring-red-600' : ''
                 }`}
                 aria-label={`Rank ${index + 1}: ${chili.name} by ${chili.contestant_name}`}
               >
