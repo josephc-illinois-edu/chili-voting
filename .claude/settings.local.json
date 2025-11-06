@@ -22,7 +22,9 @@
       "Bash(pkill:*)",
       "Bash(taskkill:*)",
       "Bash(cat:*)",
-      "Read(//c/Users/josephc/Desktop/**)"
+      "Read(//c/Users/josephc/Desktop/**)",
+      "mcp__design-guide__design_review",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
