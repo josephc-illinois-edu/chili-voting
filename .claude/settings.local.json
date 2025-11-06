@@ -30,7 +30,8 @@
       "Bash(git stash pop:*)",
       "WebFetch(domain:docs.google.com)",
       "Bash(npx xlsx:*)",
-      "Bash(npx xlsx-cli:*)"
+      "Bash(npx xlsx-cli:*)",
+      "Bash(pandoc:*)"
     ],
     "deny": [],
     "ask": []

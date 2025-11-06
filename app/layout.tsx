@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description: "Vote for your favorite chili at the UIF Chili Cook-Off 2025",
   icons: {
     icon: '/icon.svg',
+    shortcut: '/icon.svg',
     apple: '/icon.svg',
   },
   manifest: '/manifest.json',
@@ -20,6 +21,9 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Chili Cook-Off',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
   formatDetection: {
     telephone: false,
