@@ -240,6 +240,8 @@ export class ChiliDatabase {
         .insert({
           name: entry.name.trim(),
           contestant_name: entry.contestantName.trim(),
+          contestant_email: entry.contestantEmail?.trim() || null,
+          chili_type: entry.chiliType?.trim() || null,
           recipe: entry.recipe?.trim() || null,
           ingredients: entry.ingredients ? entry.ingredients.split(',').map(i => i.trim()).filter(i => i) : [],
           allergens: entry.allergens ? entry.allergens.split(',').map(a => a.trim()).filter(a => a) : [],

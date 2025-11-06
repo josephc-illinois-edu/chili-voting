@@ -82,6 +82,8 @@ export async function POST(request: NextRequest) {
         const submission = {
           name: entry.name,
           contestantName: entry.contestant_name,
+          contestantEmail: entry.contestant_email || '',
+          chiliType: entry.chili_type || '',
           recipe: entry.recipe || '',
           ingredients: entry.ingredients.join(', '),
           allergens: entry.allergens.join(', '),

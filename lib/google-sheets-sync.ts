@@ -140,6 +140,8 @@ export class GoogleSheetsSync {
     return {
       name: row.chiliName || `${contestantName}'s Chili`,
       contestant_name: contestantName,
+      contestant_email: row.email || null,
+      chili_type: row.chiliType || null,
       recipe: '', // Not collected in form, leave empty
       ingredients,
       allergens,
