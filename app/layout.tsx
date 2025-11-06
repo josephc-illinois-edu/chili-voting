@@ -50,6 +50,18 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         {children}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Only register service worker in production (not on localhost)
+            if ('serviceWorker' in navigator && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                  .then((reg) => console.log('Service Worker registered'))
+                  .catch((err) => console.log('Service Worker registration failed:', err));
+              });
+            }
+          `
+        }} />
       </body>
     </html>
   );
