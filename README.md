@@ -9,6 +9,7 @@ A modern TypeScript voting application with anonymous voting, Google Sheets inte
 - **Ballot Stuffing Prevention**: Multiple layers of duplicate vote detection
 - **Category Ratings**: Vote on taste, presentation, creativity, and spice balance
 - **Mobile-First Design**: Responsive interface optimized for smartphones
+- **Progressive Web App**: Installable on mobile devices with offline capability
 
 ### Contestant Features
 - **Self-Service Portal**: Contestants can manage their own entries via unique codes
@@ -22,10 +23,12 @@ A modern TypeScript voting application with anonymous voting, Google Sheets inte
 - **QR Code Generation**: Generate printable QR codes for each entry
 - **Results Dashboard**: Real-time voting statistics and leaderboards
 
-### Integration
+### Integration & Performance
 - **Google Forms Integration**: Seamlessly sync contestant submissions
 - **Supabase Backend**: PostgreSQL database with real-time updates
 - **Rich Text Support**: TipTap editor for recipes and descriptions
+- **Service Worker Caching**: Faster loading with intelligent cache strategies
+- **Offline Support**: Graceful degradation when connection is lost
 
 ## 🚀 Quick Start
 
@@ -127,6 +130,7 @@ Open [http://localhost:3000](http://localhost:3000)
 - [ ] Set up Supabase Storage bucket
 - [ ] Import entries from Google Forms (if using)
 - [ ] Test voting flow on multiple devices
+- [ ] Test PWA "Add to Home Screen" on production
 - [ ] Generate and print QR codes for all entries
 - [ ] Test contestant self-service portal
 - [ ] Set up results display (projector/TV)
@@ -170,6 +174,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
 ## 🎨 Recent Updates
 
+- **PWA Implementation**: Added service worker for offline capability and "Add to Home Screen"
 - Replaced icon library with native emoji (smaller bundle size!)
 - Added Google Sheets integration for form imports
 - Implemented contestant self-service portal

@@ -91,6 +91,11 @@ Example: `https://chili-voting.vercel.app`
    - Vote for it
    - Check results page
    - Try the QR code generation
+3. Test PWA features (production only):
+   - Open site on mobile device
+   - Look for "Add to Home Screen" prompt
+   - Install app to home screen
+   - Verify offline capability (turn off wifi)
 
 ## Step 6: Add Custom Domain (Optional)
 
@@ -159,6 +164,9 @@ Before your event:
 - [ ] Verify QR codes work
 - [ ] Check results page updates
 - [ ] Test admin panel access
+- [ ] Test PWA installation on mobile devices
+- [ ] Verify "Add to Home Screen" works
+- [ ] Test offline capability (graceful degradation)
 - [ ] Print QR code tent cards with production URL
 - [ ] Test on different devices (iPhone, Android, tablets)
 - [ ] Share production URL with event organizers
