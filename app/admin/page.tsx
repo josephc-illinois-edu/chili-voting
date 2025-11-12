@@ -389,16 +389,23 @@ export default function AdminPage() {
               <span>Delete Test Entries ({stats.testEntries})</span>
             </button>
 
-            <button
-              onClick={handleSyncGoogleSheets}
-              disabled={syncing || loading}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-semibold focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              aria-label="Sync chili entries from Google Sheets"
-              aria-busy={syncing}
-            >
-              <RefreshCw size={20} aria-hidden="true" className={syncing ? 'animate-spin' : ''} />
-              <span>{syncing ? 'Syncing...' : 'Sync Google Sheets'}</span>
-            </button>
+<div className="flex flex-col gap-2">
+  <button
+    disabled
+    className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed font-semibold"
+    aria-label="Sync Google Sheets - Coming soon feature"
+    title="This feature is coming in a future update. Use CSV import for now."
+  >
+    <RefreshCw size={20} aria-hidden="true" />
+    <span>Sync Google Sheets</span>
+    <span className="ml-2 text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full font-semibold">
+      Coming Soon
+    </span>
+  </button>
+  <p className="text-xs text-gray-500 text-center">
+    💡 <strong>For now:</strong> Use CSV import via terminal
+  </p>
+</div>
           </div>
         </section>
 

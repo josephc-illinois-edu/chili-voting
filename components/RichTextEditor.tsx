@@ -39,6 +39,8 @@ export default function RichTextEditor({
         heading: {
           levels: [3, 4], // Only allow h3 and h4
         },
+            // Explicitly disable link in StarterKit to avoid duplicate
+    link: false,
       }),
       Link.configure({
         openOnClick: false,
